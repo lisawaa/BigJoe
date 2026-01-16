@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
@@ -25,8 +27,11 @@ public class KitbotIntakeSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Intake Feed Voltage", IntakeConstants.INTAKE_FEED_VOLT);
 
         intakeMotor = new SparkMax(IntakeConstants.INTAKE_MOTOR_PORT, MotorType.kBrushless);
+        
         SparkMaxConfig intakeConfig = new SparkMaxConfig();
         intakeConfig.smartCurrentLimit(IntakeConstants.INTAKE_FEED_LIMIT);
+        
+        intakeMotor.configure(intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     }
 
