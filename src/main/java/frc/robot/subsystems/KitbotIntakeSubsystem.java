@@ -32,18 +32,21 @@ public class KitbotIntakeSubsystem extends SubsystemBase {
         intakeConfig.smartCurrentLimit(IntakeConstants.INTAKE_FEED_LIMIT);
         
         intakeMotor.configure(intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
     }
-
-    // A method to set the voltage of the intake roller
+    
+    /**
+     * Sets the voltage of the intake roller motor
+     *
+     * @param voltage The voltage to set the intake roller motor to
+     */
     public void setFeederRoller(double voltage) {
         intakeMotor.setVoltage(voltage);
     }
 
     /**
     * Returns whether the intake is currently intaking or not
-
-    * @Return Boolean isIntaking
+    *
+    * @Return {@Boolean} isIntaking
     */
     public Boolean isIntaking() {
         return isIntaking;
@@ -73,6 +76,23 @@ public class KitbotIntakeSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("Is Intaking", isIntaking);
     }
 
+    /**
+     * Stop intaking with a wpilib single run Command
+     * 
+     * @return {@edu.wpi.first.wpilibj2.command.Command} Command to stop intake
+     */
+
+    public Command stopIntakeCommand() {
+        return runOnce(() -> {
+            stopIntake();
+        });
+    }
+
+    /**
+     * Run intake with a wpilib single run Command
+     * 
+     * @return {@edu.wpi.first.wpilibj2.command.Command} Command to run intake
+     */
     public Command runIntakeCommand() {
         return runOnce(() -> {
             Intake();
