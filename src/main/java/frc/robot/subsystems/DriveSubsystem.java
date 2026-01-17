@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.Optional;
+
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
@@ -80,14 +82,19 @@ public class DriveSubsystem extends SubsystemBase{
         getRotation2d(),
         getSwerveModulePosition());
 
-    private final VisionSubsystem visionIO = (Operating.Constants.USING_VISION) ? new VisionSubsystem() : null;
-    private final VisionIOInputs visionInputs = (Operating.Constants.USING_VISION) ? new VisionIOInputs() : null;
+    private VisionSubsystem visionIO = null;
     private SwerveDrivePoseEstimator poseEstimator =
         new SwerveDrivePoseEstimator(Drive.Constants.DRIVE_KINEMATICS, getRotation2d(), getSwerveModulePosition(), new Pose2d(),
             Vision.Constants.SINGLE_STD_DEVS, Vision.Constants.SINGLE_STD_DEVS);
     
     //Constructs a new DriveSubsystem
-    public DriveSubsystem() {
+    public DriveSubsystem(Optional<VisionSubsystem> photonVision) {
+        if(photonVision.isEmpty()) {
+            visionIO = new VisionSubsystem();
+        } else {
+            visionIO = photonVision.get();
+        }
+        
         //Usage reporting for MAXSwerve template
         HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
         RobotConfig config;
@@ -259,14 +266,12 @@ public class DriveSubsystem extends SubsystemBase{
         }
         if(Operating.Constants.USING_VISION) {
             poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getRotation2d(), getSwerveModulePosition());
-
-            visionIO.updateInputs(visionInputs, getOdometry());
-
-            if(visionInputs.hasEstimate){
-                for(int i = 0; i < visionInputs.estimate.length; i++) {
-                    poseEstimator.addVisionMeasurement(visionInputs.estimate[i], Timer.getFPGATimestamp());
+            VisionIOInputs inputs = visionIO.getInputs();
+            for(int i = 0; i < inputs.cameraPoses.length; i++) {
+                if(inputs.cameraTargets[i] != null) {
+                    poseEstimator.addVisionMeasurement(inputs.cameraPoses[i].toPose2d(), Timer.getFPGATimestamp());
                 }
-            }  
+            }
             publisherPose.set(poseEstimator.getEstimatedPosition());
         }
     }

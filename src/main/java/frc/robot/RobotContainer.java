@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.util.Optional;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -18,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OI;
 import frc.robot.Constants.Operating;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.VisionSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -27,7 +30,8 @@ import frc.robot.subsystems.DriveSubsystem;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private DriveSubsystem m_driveSub;
+  private DriveSubsystem driveSub;
+  private VisionSubsystem visionSub;
 
   private final CommandXboxController m_driverController =
       new CommandXboxController(OI.Constants.DRIVE_CONTROLLER_PORT);
@@ -53,17 +57,20 @@ public class RobotContainer {
   }
 
   public void initSubystems() {
+    if(Operating.Constants.USING_VISION) {
+      visionSub = new VisionSubsystem();
+    }
     if(Operating.Constants.USING_DRIVE) {
-      m_driveSub = new DriveSubsystem();
-      m_driveSub.setDefaultCommand(new RunCommand(
-        () -> m_driveSub.drive(
+      driveSub = new DriveSubsystem(Optional.ofNullable(visionSub));
+      driveSub.setDefaultCommand(new RunCommand(
+        () -> driveSub.drive(
                   OI.Constants.DRIVER_AXIS_Y_INVERTED * MathUtil.applyDeadband(m_driverController.getRawAxis(OI.Constants.DRIVER_AXIS_Y), OI.Constants.DRIVE_DEADBAND),
                   OI.Constants.DRIVER_AXIS_X_INVERTED * MathUtil.applyDeadband(m_driverController.getRawAxis(OI.Constants.DRIVER_AXIS_X), OI.Constants.DRIVE_DEADBAND),
                   OI.Constants.DRIVER_AXIS_ROT_INVERTED * MathUtil.applyDeadband(m_driverController.getRawAxis(OI.Constants.DRIVER_AXIS_ROT), OI.Constants.DRIVE_DEADBAND), 
                   true,
                   "Default / Field Oriented"
         ),
-        m_driveSub));
+        driveSub));
     } 
     // extend if-else chain for other subsystems
   }

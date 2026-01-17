@@ -4,218 +4,100 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
-import org.photonvision.targeting.PhotonTrackedTarget;
 
+import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.net.PortForwarder;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Vision;
 import frc.robot.Constants.Vision.VisionIOInputs;
 
-public class VisionSubsystem extends SubsystemBase{
+public class VisionSubsystem extends SubsystemBase {
     
-    private final PhotonCamera camera1;
-    private final PhotonPoseEstimator camera1Estimator;
+    public class TagPlacements
+    {
+        List<AprilTag> tags;
+    };
+        
+    private final ArrayList<PhotonCamera> cameras = new ArrayList<PhotonCamera>();
+    private final ArrayList<PhotonPoseEstimator> cameraEstimators = new ArrayList<PhotonPoseEstimator>();
 
-    private final PhotonCamera camera2;
-    private final PhotonPoseEstimator camera2Estimator;
-    
-    private final AprilTagFieldLayout layout = Vision.Constants.TARGET_POSES;
+    //add more cameras if needed
+    private StructPublisher<Pose3d> publisherCamera1Pose = NetworkTableInstance.getDefault().getStructTopic("Camera1Pose", Pose3d.struct).publish();
+    private StructPublisher<Pose3d> publisherCamera2Pose = NetworkTableInstance.getDefault().getStructTopic("Camera2Pose", Pose3d.struct).publish();
+    private StructArrayPublisher<Pose3d> publisherTagPoses = NetworkTableInstance.getDefault().getStructArrayTopic("TagPlacements", Pose3d.struct).publish();
+
+    private VisionIOInputs visionInputs = new VisionIOInputs();
 
     public VisionSubsystem() {
-        //CHANGE
         PortForwarder.add(5810, "10.44.70.203", 5810);
-        layout.setOrigin(AprilTagFieldLayout.OriginPosition.kBlueAllianceWallRightSide);
 
-        camera1 = new PhotonCamera("camera1");
-        camera1Estimator = new PhotonPoseEstimator(layout, 
-            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, Vision.Constants.CAMERA_TO_ROBOT[0]);
-        camera1Estimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+        // camera 1
+        cameras.add(new PhotonCamera("camera1"));
+        cameraEstimators.add(new PhotonPoseEstimator(Vision.Constants.TARGET_POSES, 
+            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, Vision.Constants.CAMERA_TO_ROBOT[0]));
 
-        camera2 = new PhotonCamera("camera2");
-        camera2Estimator = new PhotonPoseEstimator(layout,
-             PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, Vision.Constants.CAMERA_TO_ROBOT[1]);
-        camera2Estimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+        // camera 2
+        cameras.add(new PhotonCamera("camera2"));
+        cameraEstimators.add(new PhotonPoseEstimator(Vision.Constants.TARGET_POSES,
+             PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, Vision.Constants.CAMERA_TO_ROBOT[1]));
     }
 
-    public void updateInputs(VisionIOInputs inputs, Pose2d currentEstimate) {
+    @Override
+    public void periodic()
+    {
+        updateInputs();
 
-        PhotonPipelineResult[] results = getAprilTagResults();
-        PhotonPoseEstimator[] photonPoseEstimators = new PhotonPoseEstimator[]{camera1Estimator, camera2Estimator};
-
-        inputs.estimate = new Pose2d[]{ new Pose2d() };
-
-        inputs.timestamp = estimateLatestTimestamp(results);
-
-        if(hasEstimate(results)) {
-            inputs.estimate = getEstimatesArray(results, photonPoseEstimators);
-            inputs.hasEstimate = true;
-
-            int[][] cameraTargets = getCameraTargets(results);
-            inputs.camera1Targets = cameraTargets[0];
-            inputs.camera2Targets = cameraTargets[1];
-        } else {
-            inputs.timestamp = inputs.timestamp;
-            inputs.hasEstimate = false;
+        if(null != visionInputs.cameraTargets[0]) {
+            publisherCamera1Pose.set(visionInputs.cameraPoses[0]);
         }
+        if(null != visionInputs.cameraTargets[1]) {
+            publisherCamera2Pose.set(visionInputs.cameraPoses[1]);
+        }
+        List<AprilTag> Tags = Vision.Constants.TARGET_POSES.getTags();
+        Pose3d[] tagPoses = new Pose3d[Tags.size()];
+        for(int i = 0; i < Tags.size(); ++i) {
+            tagPoses[i] = Tags.get(i).pose;
+        }
+        publisherTagPoses.set(tagPoses);
     }
 
-    private PhotonPipelineResult[] getAprilTagResults() {
-        List<PhotonPipelineResult> list1 = camera1.getAllUnreadResults();
-        List<PhotonPipelineResult> list2 = camera2.getAllUnreadResults();
-        PhotonPipelineResult result1 = (list1.size() > 0) ? list1.get(list1.size() - 1) : new PhotonPipelineResult();
-        PhotonPipelineResult result2 = (list2.size() > 0) ? list2.get(list2.size() - 1) : new PhotonPipelineResult();
-        return new PhotonPipelineResult[] {result1, result2};
-    }
-
-    public boolean hasEstimate(PhotonPipelineResult[] results) {
-        for(PhotonPipelineResult result : results) {
-            if(result.hasTargets()) return true;
-        }
-        return false;
-    }
-
-    private double estimateLatestTimestamp(PhotonPipelineResult[] results) {
-        double latestTimestamp = 0;
-        int count = 0;
-        for(PhotonPipelineResult result : results) {
-            latestTimestamp = result.getTimestampSeconds();
-            count++;
-        }
-        return latestTimestamp / count;
-    }
-
-    public  Pose2d[] getEstimatesArray(PhotonPipelineResult[] results, PhotonPoseEstimator[] photonEstimator) {
-        Optional<Pose2d>[] estimates = getEstimates(results, photonEstimator);
-        Pose2d[] estimatesArray = new Pose2d[estimates.length];
-        for (int i = 0; i < estimates.length; i++) {
-            if (estimates[i].isPresent() && estimates[i].get() != null) {
-                estimatesArray[i] = estimates[i].get();
-            }
-        }
-
-        int count = 0;
-        for (int i = 0; i < estimatesArray.length; i++) {
-            if (estimatesArray[i] != null) {
-            count++;
-            }
-        }
-
-        Pose2d[] finalEstimates = new Pose2d[count];
-        int index = 0;
-        for (int i = 0; i < estimatesArray.length; i++) {
-        if (estimatesArray[i] != null) {
-            finalEstimates[index] = estimatesArray[i];
-            index++;
-        }
-        }
-
-        return finalEstimates;
-    } 
-
-    public Optional<Pose2d>[] getEstimates(PhotonPipelineResult[] results, PhotonPoseEstimator[] photonEstimator) {
-        ArrayList<Optional<Pose2d>> estimates = new ArrayList<>();
-        for (int i = 0; i < results.length; i++) {
-            PhotonPipelineResult result = results[i];
-            if (result.hasTargets()) {
-                var est = photonEstimator[i].update(result);
-                if (est.isPresent() && result.hasTargets()) {
-                    estimates.add(Optional.of(est.get().estimatedPose.toPose2d()));
-                } else {
-                    estimates.add(Optional.empty());
-                }
+    public void updateInputs() {
+        int numberOfCameras = cameras.size();
+        visionInputs.cameraPoses = new Pose3d[numberOfCameras];
+        visionInputs.cameraTargets = new List[numberOfCameras];
+        double sumTimestamp = 0.0;
+        for(int i = 0; i < cameras.size(); ++i) {
+            PhotonCamera camera = cameras.get(i);
+            PhotonPoseEstimator estimator = cameraEstimators.get(i);           
+            List<PhotonPipelineResult> results = camera.getAllUnreadResults();
+            PhotonPipelineResult result = !results.isEmpty() ? results.get(results.size() - 1) : new PhotonPipelineResult();
+            sumTimestamp += result.getTimestampSeconds();
+            Optional<EstimatedRobotPose> estimatedPose = estimator.update(result);
+            if(!estimatedPose.isPresent()) {
+                visionInputs.cameraPoses[i] = Pose3d.kZero;
+                visionInputs.cameraTargets[i] = null;
             } else {
-                estimates.add(Optional.empty());
+                visionInputs.cameraPoses[i] = estimatedPose.get().estimatedPose;
+                visionInputs.cameraTargets[i] = estimatedPose.get().targetsUsed;
             }
         }
-        Optional<Pose2d>[] estimatesArray = estimates.toArray(new Optional[0]);
-        return estimatesArray;
-    } 
-
-    public int[][] getCameraTargets(PhotonPipelineResult[] results) {
-        int[][] targets = new int[results.length][];
-    
-        for (int i = 0; i < results.length; i++) {
-          targets[i] = new int[results[i].targets.size()];
-          for (int j = 0; j < results[i].targets.size(); j++) {
-            targets[i][j] = results[i].targets.get(j).getFiducialId();
-          }
+        // protect against division by 0 if there are no cameras configured
+        if(0.0 != sumTimestamp) {
+            visionInputs.timestamp = sumTimestamp / cameras.size();
         }
-    
-        return targets;
-    }
-   
-   //Unused? Multi/SIngle standard deviations constans rn, see if it's better for variability
-   public  List<Matrix<N3, N1>> getStdArray(VisionIOInputs inputs, Pose2d currentPose) {
-        List<Matrix<N3, N1>> stdsArray = new ArrayList<Matrix<N3, N1>>();
-
-        for (int i = 0; i < getCameraTargets(inputs).length; i++) {
-            if (getCameraTargets(inputs)[i].length != 0) {
-                stdsArray.add(getEstimationStdDevs(inputs, currentPose, i));
-            }
-        }
-
-        return stdsArray;
     }
 
-    public  int[][] getCameraTargets(VisionIOInputs inputs) {
-        return new int[][] { inputs.camera1Targets, inputs.camera2Targets, inputs.camera3Targets };
-    }
-
-    public  Matrix<N3, N1> getEstimationStdDevs(VisionIOInputs inputs, Pose2d pose, int camera) {
-        var estStdDevs = Vision.Constants.SINGLE_STD_DEVS;
-        int numTags = 0;
-        double avgDist = 0;
-        int[] targets = getCameraTargets(inputs)[camera];
-        for (var tgt : targets) {
-            Optional<Pose3d> tagPose = layout.getTagPose(tgt);
-            if (tagPose.isEmpty())
-                continue;
-            numTags++;
-            avgDist += tagPose.get().toPose2d().getTranslation().getDistance(pose.getTranslation());
-        }     
-        if (numTags == 0)
-            return estStdDevs;
-        avgDist /= numTags;
-        // Decrease std devs if multiple targets are visible
-        if (numTags > 1)
-            estStdDevs = Vision.Constants.MULTI_STD_DEVS;
-        // Increase std devs based on (average) distance
-        if (numTags == 1 && avgDist > 4)
-            estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-        else
-        estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
-
-        return estStdDevs;
-    }
-
-    public Pose3d[] getTargetsPositions(PhotonPipelineResult[] results) {
-        int total_targets = 0;
-        for (int i = 0; i < results.length; i++) {
-            if (results[i].hasTargets()) {
-                total_targets += results[i].getTargets().size();
-            }
-        }
-        Pose3d[] targets = new Pose3d[total_targets];
-        int index = 0;
-        for (int i = 0; i < results.length; i++) {
-            if (results[i].hasTargets()) {
-                for (PhotonTrackedTarget target : results[i].getTargets()) {
-                    targets[index] = layout.getTagPose(target.getFiducialId()).get();
-                    index++;
-                }
-            }
-        }
-        return targets;
+    public VisionIOInputs getInputs() {
+        return visionInputs;
     }
 }
