@@ -80,11 +80,11 @@ public class DriveSubsystem extends SubsystemBase{
         getRotation2d(),
         getSwerveModulePosition());
 
-    //private final VisionIOPhoton visionIO = (Operating.Constants.USING_VISION) ? new VisionIOPhoton() : null; <- ADD SOON
+    private final VisionSubsystem visionIO = (Operating.Constants.USING_VISION) ? new VisionSubsystem() : null;
     private final VisionIOInputs visionInputs = (Operating.Constants.USING_VISION) ? new VisionIOInputs() : null;
     private SwerveDrivePoseEstimator poseEstimator =
         new SwerveDrivePoseEstimator(Drive.Constants.DRIVE_KINEMATICS, getRotation2d(), getSwerveModulePosition(), new Pose2d(),
-            Vision.Constants.kSingleTagStdDevs, Vision.Constants.kSingleTagStdDevs);
+            Vision.Constants.SINGLE_STD_DEVS, Vision.Constants.SINGLE_STD_DEVS);
     
     //Constructs a new DriveSubsystem
     public DriveSubsystem() {
@@ -166,8 +166,12 @@ public class DriveSubsystem extends SubsystemBase{
     }
 
     //Returns the currently-estimated pose of the robot
-    public Pose2d getPose() {
+    public Pose2d getOdometry() {
         return odometry.getPoseMeters();
+    }
+
+    public Pose2d getPose() {
+        return poseEstimator.getEstimatedPosition();
     }
 
     //WIP
@@ -217,7 +221,7 @@ public class DriveSubsystem extends SubsystemBase{
         try {
             var config = RobotConfig.fromGUISettings();
             AutoBuilder.configure(
-                this::getPose,   // Supplier of current robot pose
+                this::getOdometry,   // Supplier of current robot pose
                 this::resetOdometry,         // Consumer for seeding pose against auto
                 this::getRobotRelativeSpeeds, // Supplier of current robot speeds
                 // Consumer of ChassisSpeeds and feedforwards to drive the robot
@@ -256,7 +260,7 @@ public class DriveSubsystem extends SubsystemBase{
         if(Operating.Constants.USING_VISION) {
             poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getRotation2d(), getSwerveModulePosition());
 
-            //visionIO.updateInputs(visionInputs, getPose());
+            visionIO.updateInputs(visionInputs, getOdometry());
 
             if(visionInputs.hasEstimate){
                 for(int i = 0; i < visionInputs.estimate.length; i++) {

@@ -14,18 +14,18 @@ import edu.wpi.first.math.util.Units;
 
 public class Vision {
     public static final class Constants {
-        //flip signs?
-        public static final Transform3d[] CAMERA_TO_ROBOT = //Adjust
+        //CHANGE
+        public static final Transform3d[] CAMERA_TO_ROBOT = 
         {
          new Transform3d(new Translation3d(Units.inchesToMeters(16), Units.inchesToMeters(-8), Units.inchesToMeters(6)), 
             new Rotation3d(0, Units.degreesToRadians(60), 0)),
          new Transform3d(new Translation3d(Units.inchesToMeters(16), Units.inchesToMeters(8), Units.inchesToMeters(6)), 
             new Rotation3d(0, Units.degreesToRadians(60), 0))
         };
-        public static final AprilTagFieldLayout m_targetPoses = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
+        public static final AprilTagFieldLayout TARGET_POSES = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
         //Adjust
-        public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(0.1, 0.1, Units.radiansToDegrees(5));
-        public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.1, 0.1, Units.radiansToDegrees(5));
+        public static final Matrix<N3, N1> SINGLE_STD_DEVS = VecBuilder.fill(0.1, 0.1, Units.radiansToDegrees(5));
+        public static final Matrix<N3, N1> MULTI_STD_DEVS = VecBuilder.fill(0.1, 0.1, Units.radiansToDegrees(5));
     }
     public static class VisionIOInputs {
         public Pose2d[] estimate = new Pose2d[0];
