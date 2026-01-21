@@ -4,7 +4,7 @@
 
 package frc.robot;
 
-import frc.robot.Constants.Shared;
+import frc.robot.Constants.shared;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -24,11 +24,8 @@ import frc.robot.commands.IntakeCommand;
 
 public class RobotContainer {
 
-  
-  
-
-  private final CommandXboxController m_driverController =
-      new CommandXboxController(Shared.OperatorConstants.DRIVER_CONTROLLER_PART);
+  private final CommandXboxController driverController =
+      new CommandXboxController(shared.OperatorConstants.DRIVER_CONTROLLER_PART);
 
   public RobotContainer() {
     configureBindings();
@@ -53,7 +50,7 @@ public class RobotContainer {
   }
 
   public void controllerPresetMain() {
-    // if (usingIntake) {}
+     //
   }
 
 }
