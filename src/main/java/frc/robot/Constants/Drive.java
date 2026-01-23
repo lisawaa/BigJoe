@@ -1,5 +1,6 @@
 package frc.robot.Constants;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
@@ -38,7 +39,14 @@ public final class Drive {
             BACK_RIGHT
         }
 
-        public static final String CONFIGS = null;;
+        public static final PIDController ROTATION_CONTROLLER = getRotationController();
+        private static final PIDController getRotationController() {
+            PIDController controller = new PIDController(2.0, 0.0, 0.0); //Edit
+            controller.enableContinuousInput(-Math.PI, Math.PI);
+            return controller;
+        }
+
+        public static final String CONFIGS = null;
     }
 
     //Update(?)

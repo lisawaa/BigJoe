@@ -24,7 +24,7 @@ public class SwerveModule extends SubsystemBase {
   private final SparkMax turnMotor;
 
   private final RelativeEncoder driveEncoder;
-  private final AbsoluteEncoder m_turnEncoder;
+  private final AbsoluteEncoder turnEncoder;
 
   private final SparkClosedLoopController driveController;
   private final SparkClosedLoopController turnController;
@@ -42,7 +42,7 @@ public class SwerveModule extends SubsystemBase {
     turnMotor = new SparkMax(turnID, MotorType.kBrushless);
 
     driveEncoder = driveMotor.getEncoder();
-    m_turnEncoder = turnMotor.getAbsoluteEncoder();
+    turnEncoder = turnMotor.getAbsoluteEncoder();
 
     driveController = driveMotor.getClosedLoopController();
     turnController = turnMotor.getClosedLoopController();
@@ -55,7 +55,7 @@ public class SwerveModule extends SubsystemBase {
     turnMotor.configure(Configs.SwerveModule.TURNING_CONFIG, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters); //Add turn config constant
 
     chassisAngularOffset = offset;
-    desiredState.angle = new Rotation2d(m_turnEncoder.getPosition());
+    desiredState.angle = new Rotation2d(turnEncoder.getPosition());
     if(inverted)
       driveEncoderInverted = -1.0;
     else 
@@ -70,7 +70,7 @@ public class SwerveModule extends SubsystemBase {
     correctedDesiredState.angle = desiredState.angle.plus(Rotation2d.fromRadians(chassisAngularOffset));
 
     //Optimize the reference state as to not turn more than 90 degrees.
-    correctedDesiredState.optimize(new Rotation2d(m_turnEncoder.getPosition()));
+    correctedDesiredState.optimize(new Rotation2d(turnEncoder.getPosition()));
 
     //Command driving and turning SPARKS toward their respective setpoints.
     driveController.setSetpoint(correctedDesiredState.speedMetersPerSecond, ControlType.kVelocity);
@@ -85,7 +85,7 @@ public class SwerveModule extends SubsystemBase {
     //Apply chassis offset to the encoder position to get the position relative to the chassis.
     return new SwerveModuleState(
       getDriveVelocity(),
-      new Rotation2d(m_turnEncoder.getPosition() - chassisAngularOffset));
+      new Rotation2d(turnEncoder.getPosition() - chassisAngularOffset));
   }
 
   //Returns the current position of the module.
@@ -93,7 +93,7 @@ public class SwerveModule extends SubsystemBase {
     //Apply chassis offset to the encoder position to get the position relative to the chassis.
     return new SwerveModulePosition(
         getDrivePosition(),
-        new Rotation2d(m_turnEncoder.getPosition() - chassisAngularOffset));
+        new Rotation2d(turnEncoder.getPosition() - chassisAngularOffset));
   }
 
   //Returns the encoder position of the drive motor in radians.
@@ -108,12 +108,12 @@ public class SwerveModule extends SubsystemBase {
 
   //Returns the position of the turn motor in radians.
   public double getTurnPosition() {
-    return m_turnEncoder.getPosition();
+    return turnEncoder.getPosition();
   }
 
   //Returns the module's turn velocity in m/s.
   public double getTurnVelocity() {
-    return m_turnEncoder.getVelocity();
+    return turnEncoder.getVelocity();
   }
 
   //Zeroes the module's encoders.
@@ -128,17 +128,17 @@ public class SwerveModule extends SubsystemBase {
   }
 
   //Tests motor speed or turns it to a set angle (radians)
-  public void testDriveMotors(double p_speed) {
-    driveMotor.set(p_speed);
+  public void testDriveMotors(double speed) {
+    driveMotor.set(speed);
   }
-  public void testTurnMotors(double p_position) {
-    turnController.setSetpoint(p_position, ControlType.kPosition);
+  public void testTurnMotors(double position) {
+    turnController.setSetpoint(position, ControlType.kPosition);
   }
 
   public void updateSmartDashboard() {
     SmartDashboard.putNumber(motorLocation + " driver enoder", getDrivePosition());
     SmartDashboard.putNumber(motorLocation + " driver velocity", getDriveVelocity());
-    SmartDashboard.putNumber(motorLocation + " turn encoder", m_turnEncoder.getPosition());
+    SmartDashboard.putNumber(motorLocation + " turn encoder", turnEncoder.getPosition());
   }
 
   @Override

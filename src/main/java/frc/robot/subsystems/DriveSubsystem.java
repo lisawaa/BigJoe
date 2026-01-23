@@ -14,6 +14,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -132,6 +133,38 @@ public class DriveSubsystem extends SubsystemBase{
 
         SmartDashboard.putString("Drive Mode", statusName);
     }
+
+    public void driveAligned(double xSpeed, double ySpeed, boolean fieldRelative, String statusName) { //fieldRelative may be redundant
+        double multiplier = 0.5; //update(?)
+        double xSpeedDelivered = xSpeed * Drive.Constants.MAX_METERS_PER_SECOND * multiplier;
+        double ySpeedDelivered = ySpeed * Drive.Constants.MAX_METERS_PER_SECOND * multiplier;
+
+        Pose2d drivePose = getPose();
+        Translation2d shooterOffsetRobot = new Translation2d(); //UPDATE
+        Translation2d shooterOffsetField = shooterOffsetRobot.rotateBy(drivePose.getRotation());
+        Translation2d shooterPos = drivePose.getTranslation().plus(shooterOffsetField);
+        Rotation2d desiredAngle = Vision.Constants.getHubPose().toPose2d().getTranslation().minus(shooterPos).getAngle();
+       
+        //rot * Drive.Constants.MAX_ANGULAR_SPEED * multiplier; Verify angles and PID with testing
+        double rotDelivered = Drive.Constants.ROTATION_CONTROLLER.calculate(drivePose.getRotation().getRadians(), desiredAngle.getRadians()); 
+    
+        //See if it needs to be field relative or not
+        SwerveModuleState[] swerveModuleStates = Drive.Constants.DRIVE_KINEMATICS.toSwerveModuleStates(
+            fieldRelative
+                ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered,
+                getRotation2d())
+                : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
+        SwerveDriveKinematics.desaturateWheelSpeeds(
+            swerveModuleStates, Drive.Constants.MAX_METERS_PER_SECOND);
+        desiredStates = swerveModuleStates;
+        frontLeft.setDesiredState(swerveModuleStates[0]);
+        frontRight.setDesiredState(swerveModuleStates[1]);
+        backLeft.setDesiredState(swerveModuleStates[2]);
+        backRight.setDesiredState(swerveModuleStates[3]);
+
+        SmartDashboard.putString("Drive Mode", statusName);
+    }
+
 
     public void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds) {
         // Stripped from Template Pathplanner Github

@@ -11,8 +11,11 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.photonvision.targeting.PhotonTrackedTarget;
 
@@ -31,6 +34,14 @@ public class Vision {
         //Adjust
         public static final Matrix<N3, N1> SINGLE_STD_DEVS = VecBuilder.fill(0.1, 0.1, Units.radiansToDegrees(5));
         public static final Matrix<N3, N1> MULTI_STD_DEVS = VecBuilder.fill(0.1, 0.1, Units.radiansToDegrees(5));
+
+        public static final Pose3d redHubPose = new Pose3d(Units.inchesToMeters(468.56), Units.inchesToMeters(158.32), Units.inchesToMeters(72.0), new Rotation3d());
+        public static final Pose3d blueHubPose = new Pose3d(Units.inchesToMeters(152.56), Units.inchesToMeters(158.32),  Units.inchesToMeters(72.0), new Rotation3d());
+       
+        public static final Pose3d getHubPose() {
+            Pose3d pose = DriverStation.getAlliance().equals(Optional.of(Alliance.Red)) ? redHubPose : blueHubPose;
+            return pose;
+        }
     }
     public static class VisionIOInputs {
         public Pose3d cameraPoses[];

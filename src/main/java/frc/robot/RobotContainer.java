@@ -8,7 +8,6 @@ import java.util.Optional;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
-import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -16,7 +15,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OI;
 import frc.robot.Constants.Operating;
 import frc.robot.subsystems.DriveSubsystem;
@@ -79,6 +77,15 @@ public class RobotContainer {
     int preset = 0;
     switch (preset){ //Add other controller schemes later
       default: //Main controller scheme
+        if(Operating.Constants.USING_VISION) {
+            controller.leftTrigger().whileTrue(new RunCommand(() -> driveSub.driveAligned(
+                  OI.Constants.DRIVER_AXIS_Y_INVERTED * MathUtil.applyDeadband(controller.getRawAxis(OI.Constants.DRIVER_AXIS_Y), OI.Constants.DRIVE_DEADBAND),
+                  OI.Constants.DRIVER_AXIS_X_INVERTED * MathUtil.applyDeadband(controller.getRawAxis(OI.Constants.DRIVER_AXIS_X), OI.Constants.DRIVE_DEADBAND),
+                  true,
+                  "Aiming / Field Oriented"
+            ), 
+            driveSub));
+        }
         break;
     }    
   }
