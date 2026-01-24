@@ -41,7 +41,7 @@ public final class Drive {
 
         public static final PIDController ROTATION_CONTROLLER = getRotationController();
         private static final PIDController getRotationController() {
-            PIDController controller = new PIDController(2.0, 0.0, 0.0); //Edit
+            PIDController controller = new PIDController(2.5, 0.0, 0.0); //Edit
             controller.enableContinuousInput(-Math.PI, Math.PI);
             return controller;
         }

@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -41,9 +42,9 @@ public class RobotContainer {
     initSubystems();
 
     if(Operating.Constants.USING_DRIVE){
-      autoChooser = AutoBuilder.buildAutoChooser("Tests");
+      autoChooser = AutoBuilder.buildAutoChooser("Test");
       //Add paths here
-      //autoChooser.addOption("Forward Right", new PathPlannerAuto("Forward Right")); <- example
+      autoChooser.addOption("Test", new PathPlannerAuto("Test")); 
       SmartDashboard.putData("Auto Mode", autoChooser);
     } else {
       autoChooser = null;
@@ -92,8 +93,9 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    if(Operating.Constants.USING_DRIVE)
+    if(Operating.Constants.USING_DRIVE){
       return autoChooser.getSelected();
+    }
     else 
       return null;
   }

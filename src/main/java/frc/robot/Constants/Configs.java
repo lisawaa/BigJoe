@@ -52,7 +52,7 @@ public final class Configs {
             FR_CONFIG
                 .idleMode(IdleMode.kBrake)
                 .smartCurrentLimit(50)
-                .inverted(false);
+                .inverted(!false);
             FR_CONFIG.encoder
                 .positionConversionFactor(DRIVING_FACTOR) //meters
                 .velocityConversionFactor(DRIVING_FACTOR / 60.0);
@@ -78,7 +78,7 @@ public final class Configs {
             BR_CONFIG
                 .idleMode(IdleMode.kBrake)
                 .smartCurrentLimit(50)
-                .inverted(true);
+                .inverted(!true);
             BR_CONFIG.encoder
                 .positionConversionFactor(DRIVING_FACTOR) //meters
                 .velocityConversionFactor(DRIVING_FACTOR / 60.0);
