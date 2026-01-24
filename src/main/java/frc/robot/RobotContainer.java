@@ -42,9 +42,10 @@ public class RobotContainer {
     initSubystems();
 
     if(Operating.Constants.USING_DRIVE){
-      autoChooser = AutoBuilder.buildAutoChooser("Test");
+      autoChooser = AutoBuilder.buildAutoChooser("1");
       //Add paths here
-      autoChooser.addOption("Test", new PathPlannerAuto("Test")); 
+      autoChooser.addOption("1", new PathPlannerAuto("1"));      
+      autoChooser.addOption("2", new PathPlannerAuto("2")); 
       SmartDashboard.putData("Auto Mode", autoChooser);
     } else {
       autoChooser = null;
