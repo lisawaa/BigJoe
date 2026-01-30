@@ -4,56 +4,50 @@
 
 package frc.robot;
 
-import frc.robot.Constants.Shared;
-import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.*;
+import frc.robot.subsystems.*;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.IntakeCommand;
-
-
-
-
-/**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
- * subsystems, commands, and trigger mappings) should be declared here.
- */
-
-
 
 public class RobotContainer {
 
+  private final CommandXboxController controller =
+      new CommandXboxController(Shared.OperatorConstants.DRIVER_CONTROLLER_PORT);
   
-  
-
-  private final CommandXboxController m_driverController =
-      new CommandXboxController(Shared.OperatorConstants.DRIVER_CONTROLLER_PART);
+  private DriveSubsystem driveSub;
+  private KitbotIntakeSubsystem intakeSub;
+  private KitbotShootingSubsystem shootSub;
 
   public RobotContainer() {
+    driveSub = new DriveSubsystem();
+    intakeSub = new KitbotIntakeSubsystem();
+    shootSub = new KitbotShootingSubsystem();
+     
     configureBindings();
   }
 
-  /**
-   * Use this method to define your trigger->command mappings. Triggers can be created via the
-   * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
-   * predicate, or via the named factories in {@link
-   * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
-   * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-   * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-   * joysticks}.
-   */
-
   private void configureBindings() {
-    controllerPresetMain();
+      driveSub.setDefaultCommand(new RunCommand(
+        () -> driveSub.drive(
+                  OI.Constants.DRIVER_AXIS_Y_INVERTED * MathUtil.applyDeadband(controller.getRawAxis(OI.Constants.DRIVER_AXIS_Y), OI.Constants.DRIVE_DEADBAND),
+                  OI.Constants.DRIVER_AXIS_X_INVERTED * MathUtil.applyDeadband(controller.getRawAxis(OI.Constants.DRIVER_AXIS_X), OI.Constants.DRIVE_DEADBAND),
+                  OI.Constants.DRIVER_AXIS_ROT_INVERTED * MathUtil.applyDeadband(controller.getRawAxis(OI.Constants.DRIVER_AXIS_ROT), OI.Constants.DRIVE_DEADBAND), 
+                  true,
+                  "Default / Field Oriented"
+        ),
+        driveSub));  
+      controller.a().whileTrue(new RunCommand(
+        () -> intakeSub.intake(), intakeSub));
+      controller.b().whileTrue(new RunCommand(
+        () -> intakeSub.reverse(), intakeSub));
+      controller.y().whileTrue(new RunCommand(
+        () -> shootSub.shooting(), intakeSub));
   }
 
   public void configurePathPlanner() {
     return;
   }
 
-  public void controllerPresetMain() {
-    // if (usingIntake) {}
-  }
-
+  
 }
