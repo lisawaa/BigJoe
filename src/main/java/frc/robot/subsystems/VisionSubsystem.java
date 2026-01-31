@@ -75,13 +75,14 @@ public class VisionSubsystem extends SubsystemBase {
         int numberOfCameras = cameras.size();
         visionInputs.cameraPoses = new Pose3d[numberOfCameras];
         visionInputs.cameraTargets = new List[numberOfCameras];
-        double sumTimestamp = 0.0;
+        visionInputs.timestamps = new double[numberOfCameras];
         for(int i = 0; i < cameras.size(); ++i) {
+            visionInputs.timestamps[i] = 0.0;
             PhotonCamera camera = cameras.get(i);
             PhotonPoseEstimator estimator = cameraEstimators.get(i);           
             List<PhotonPipelineResult> results = camera.getAllUnreadResults();
             PhotonPipelineResult result = !results.isEmpty() ? results.get(results.size() - 1) : new PhotonPipelineResult();
-            sumTimestamp += result.getTimestampSeconds();
+            visionInputs.timestamps[i] = result.getTimestampSeconds();
             Optional<EstimatedRobotPose> estimatedPose = estimator.update(result);
             if(!estimatedPose.isPresent()) {
                 visionInputs.cameraPoses[i] = Pose3d.kZero;
@@ -90,10 +91,6 @@ public class VisionSubsystem extends SubsystemBase {
                 visionInputs.cameraPoses[i] = estimatedPose.get().estimatedPose;
                 visionInputs.cameraTargets[i] = estimatedPose.get().targetsUsed;
             }
-        }
-        // protect against division by 0 if there are no cameras configured
-        if(0.0 != sumTimestamp) {
-            visionInputs.timestamp = sumTimestamp / cameras.size();
         }
     }
 

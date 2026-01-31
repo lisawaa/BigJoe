@@ -311,7 +311,7 @@ public class DriveSubsystem extends SubsystemBase{
             VisionIOInputs inputs = visionIO.getInputs();
             for(int i = 0; i < inputs.cameraPoses.length; i++) {
                 if(inputs.cameraTargets[i] != null) {
-                    poseEstimator.addVisionMeasurement(inputs.cameraPoses[i].toPose2d(), inputs.timestamp);
+                    poseEstimator.addVisionMeasurement(inputs.cameraPoses[i].toPose2d(), inputs.timestamps[i]);
                 }
             }
         }

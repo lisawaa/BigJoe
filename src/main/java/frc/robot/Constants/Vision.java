@@ -46,6 +46,6 @@ public class Vision {
     public static class VisionIOInputs {
         public Pose3d cameraPoses[];
         public List<PhotonTrackedTarget>[] cameraTargets;
-        public double timestamp = 0.0;
+        public double[] timestamps;
     }
 }
