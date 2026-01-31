@@ -114,4 +114,31 @@ public final class Configs {
                 .follow(IDs.ClimbConstants.OUTER_LEFT_ID);       
         }
     }
+
+    public static final class Shooter {
+        public static final SparkMaxConfig FLYWHEEL_CONFIG = new SparkMaxConfig();
+
+        //invert if needed
+        static {
+            double FLYWHEEL_FACTOR = 1; //change
+
+            FLYWHEEL_CONFIG
+                .idleMode(IdleMode.kCoast)
+                .smartCurrentLimit(50)
+                .inverted(true); 
+           
+          //  FLYWHEEL_CONFIG.encoder
+          //      .positionConversionFactor(FLYWHEEL_FACTOR) //meters
+          //      .velocityConversionFactor(FLYWHEEL_FACTOR / 60.0);
+
+            FLYWHEEL_CONFIG.closedLoop
+                .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+                .pid(0.1, 0,0)
+                .apply(new FeedForwardConfig().kV(.05))
+                .outputRange(-1, 1)
+            .maxMotion
+                // Set MAXMotion parameters for position control - Edit
+                .allowedProfileError(100);
+        }
+    }
 }

@@ -28,8 +28,8 @@ public final class Drive {
 
         //update as needed
         public static final boolean FL_INVERTED = false; 
-        public static final boolean BL_INVERTED = false; 
         public static final boolean FR_INVERTED = false; 
+        public static final boolean BL_INVERTED = false; 
         public static final boolean BR_INVERTED = false; 
 
         public enum MotorLocation {

@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OI;
 import frc.robot.Constants.Operating;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
 /**
@@ -34,6 +35,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private DriveSubsystem driveSub;
   private VisionSubsystem visionSub;
+  private ShooterSubsystem shooterSub;
 
   private final CommandXboxController controller =
       new CommandXboxController(OI.Constants.DRIVE_CONTROLLER_PORT);
@@ -74,6 +76,11 @@ public class RobotContainer {
                   "Default / Field Oriented"
         ),
         driveSub));
+    }
+    if(Operating.Constants.USING_SHOOTER) {
+      shooterSub = new ShooterSubsystem();
+      shooterSub.setDefaultCommand(new RunCommand(
+        () -> shooterSub.setRPM(0), shooterSub));
     } 
     // extend if-else chain for other subsystems
   }
@@ -90,6 +97,9 @@ public class RobotContainer {
                   "Aiming / Field Oriented"
             ), 
             driveSub));
+        }
+        if(Operating.Constants.USING_SHOOTER) {
+          controller.rightTrigger().whileTrue(new RunCommand(() -> shooterSub.setRPM(1000), shooterSub));
         }
 
         if(Operating.Constants.USING_DRIVE) {

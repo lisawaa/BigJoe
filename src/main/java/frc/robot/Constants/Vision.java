@@ -28,12 +28,12 @@ public class Vision {
          new Transform3d(new Translation3d(Units.inchesToMeters(16), Units.inchesToMeters(-8), Units.inchesToMeters(6)), 
             new Rotation3d(0, Units.degreesToRadians(3), 0)),
          new Transform3d(new Translation3d(Units.inchesToMeters(16), Units.inchesToMeters(8), Units.inchesToMeters(6)), 
-            new Rotation3d(0, Units.degreesToRadians(3), 0))
+            new Rotation3d(0, -Units.degreesToRadians(3), 0))
         };
         public static final AprilTagFieldLayout TARGET_POSES = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
         //Adjust
-        public static final Matrix<N3, N1> SINGLE_STD_DEVS = VecBuilder.fill(0.1, 0.1, Units.radiansToDegrees(5));
-        public static final Matrix<N3, N1> MULTI_STD_DEVS = VecBuilder.fill(0.1, 0.1, Units.radiansToDegrees(5));
+        public static final Matrix<N3, N1> SINGLE_STD_DEVS = VecBuilder.fill(0.5, 0.5, 5);
+        public static final Matrix<N3, N1> MULTI_STD_DEVS = VecBuilder.fill(0.5, 0.5, 5);
 
         public static final Pose3d redHubPose = new Pose3d(Units.inchesToMeters(468.56), Units.inchesToMeters(158.32), Units.inchesToMeters(72.0), new Rotation3d());
         public static final Pose3d blueHubPose = new Pose3d(Units.inchesToMeters(152.56), Units.inchesToMeters(158.32),  Units.inchesToMeters(72.0), new Rotation3d());

@@ -22,4 +22,9 @@ public class IDs {
         public static final int OUTER_LEFT_ID = 3;  //3
         public static final int OUTER_RIGHT_ID = 4; //4
     }
+
+    public static final class ShooterConstants {
+        public static final int FLYWHEEL_ID = 20;
+
+    }
 }
