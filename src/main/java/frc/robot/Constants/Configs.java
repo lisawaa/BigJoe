@@ -18,13 +18,23 @@ public final class Configs {
             // NEO motor simulation constants based on actual hardware specs
             // NEO free speed: 5676 RPM, Stall torque: 3.36 N⋅m @ 12V, Stall current: 166A
 
+            // Drive motor constants (linear motion)
             // kV = nominal_voltage / max_linear_speed = 12V / 4.46 m/s
-            public static final double VOLTS_PER_VELOCITY = 12.0 / Drive.Constants.MAX_METERS_PER_SECOND; // ~2.69 V/(m/s)
+            public static final double DRIVE_VOLTS_PER_VELOCITY = 12.0 / Drive.Constants.MAX_METERS_PER_SECOND; // ~2.69 V/(m/s)
 
             // kA calculated from NEO stall torque, gear ratio, wheel radius, and estimated robot mass
             // With 4 drive motors, stall force ~1791N, mass ~50kg gives ~35.8 m/s² theoretical max
             // Practical kA accounts for friction, mass distribution: 12V / practical_accel
-            public static final double VOLTS_PER_ACCELERATION = 0.27; // V/(m/s²)
+            public static final double DRIVE_VOLTS_PER_ACCELERATION = 0.27; // V/(m/s²)
+
+            // Turn motor constants (rotational motion at module output shaft)
+            // Max output angular velocity: 5676 RPM / 46.42 = 122.3 RPM = 12.8 rad/s
+            // kV = 12V / 12.8 rad/s
+            public static final double TURN_VOLTS_PER_VELOCITY = 0.938; // V/(rad/s)
+
+            // kA based on output torque and estimated module inertia (~0.02 kg⋅m²)
+            // Max angular accel: (3.36 N⋅m * 46.42) / 0.02 = ~7800 rad/s²
+            public static final double TURN_VOLTS_PER_ACCELERATION = 0.0015; // V/(rad/s²)
 
             // Actual MAXSwerve gear ratios
             public static final double DRIVE_GEAR_RATIO = Drive.ModuleConstants.DRIVE_MOTOR_REDUCTION; // ~5.077:1
