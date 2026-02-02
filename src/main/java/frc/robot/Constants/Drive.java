@@ -33,10 +33,21 @@ public final class Drive {
         public static final boolean BR_INVERTED = false; 
 
         public enum MotorLocation {
-            FRONT_LEFT,
-            FRONT_RIGHT,
-            BACK_LEFT,
-            BACK_RIGHT
+            FRONT_LEFT("FrontLeft"),
+            FRONT_RIGHT("FrontRight"),
+            BACK_LEFT("BackLeft"),
+            BACK_RIGHT("BackRight");
+
+            private final String description;
+
+            // Enum constructors must be private or package-private
+            MotorLocation(String value) {
+                description = value;
+            }
+
+            public String getFieldDescription() {
+                return description;
+            }
         }
 
         public static final PIDController ROTATION_CONTROLLER = getRotationController();

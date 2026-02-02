@@ -12,16 +12,26 @@ public final class Configs {
         public static final SparkMaxConfig FR_CONFIG = new SparkMaxConfig();
         public static final SparkMaxConfig BL_CONFIG = new SparkMaxConfig();
         public static final SparkMaxConfig BR_CONFIG = new SparkMaxConfig();
-        public static final double FF_VELOCITY = 1 / Drive.ModuleConstants.DRIVE_WHEEL_FREE_RPS; // aka kV
+        public static final double FF_VELOCITY = 1 / Drive.ModuleConstants.DRIVE_WHEEL_FREE_RPS; 
         
-        // FIXME: UPDATE FOR SIM!
-        public static final double FF_ACCELERATION = 0.23; // aka kA
+        public static final class Sim {
+            public static final double VOLTS_PER_VELOCITY = 1.0 / 4.5; // Volts per (meter per second) - kV
+            public static final double VOLTS_PER_ACCELERATION = 0.23; // Volts per (meter per second squared) - kA
+            public static final int DRIVE_GEAR_RATIO = 3;
+            public static final int TURN_GEAR_RATIO = 3;
+            public static final double MAX_LINEAR_SPEED = 4.5; // m/s
+            public static final int DRIVE_MOTOR_COUNT = 1; // 1 NEO motor
+            public static final int TURN_MOTOR_COUNT = 1; // 1 NEO motor
 
-        public static final int DRIVE_GEAR_RATIO = 3;
-        public static final int TURN_GEAR_RATIO = 3;
-        public static final double MAX_LINEAR_SPEED = 4.5; // m/s
-        public static final int DRIVE_MOTOR_COUNT = 1; // 1 NEO motor
-        public static final int TURN_MOTOR_COUNT = 1; // 1 NEO motor
+            public static final double TURN_SIM_PID_P = 8.0;
+            public static final double TURN_SIM_PID_I = 0.0;
+            public static final double TURN_SIM_PID_D = 0.0;
+            public static final double DRIVE_SIM_PID_P = 2.0;  
+            public static final double DRIVE_SIM_PID_I = 0.0;
+            public static final double DRIVE_SIM_PID_D = 0.0;
+
+            public static final double SIM_TICK_TIME = 0.02; // seconds (50Hz)
+        }
 
         static {
             //Module constants used to calculate conversion factors and feed forward gain.
