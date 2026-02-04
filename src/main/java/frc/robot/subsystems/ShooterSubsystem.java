@@ -3,12 +3,12 @@ package frc.robot.subsystems;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Configs.Shooter;
@@ -18,24 +18,22 @@ public class ShooterSubsystem extends SubsystemBase{
     
     private final SparkMax flywheel;
     private final RelativeEncoder flywheelEncoder;
-    private final SparkClosedLoopController flywheelContrller;
-    private double targetRPM;
+    private final SparkClosedLoopController flywheelController;
 
     public ShooterSubsystem() {
-        flywheel = new SparkMax(ShooterConstants.FLYWHEEL_ID, MotorType.kBrushed);
+        flywheel = new SparkMax(ShooterConstants.FLYWHEEL_ID, MotorType.kBrushless);
         flywheel.configure(Shooter.FLYWHEEL_CONFIG, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         flywheelEncoder = flywheel.getEncoder();
-        flywheelContrller = flywheel.getClosedLoopController();
+        flywheelController = flywheel.getClosedLoopController();
     }
 
     public void setRPM(double rpm) {
-        targetRPM = rpm;
-        flywheelContrller.setSetpoint(rpm, ControlType.kMAXMotionVelocityControl);
+        flywheelController.setSetpoint(rpm, ControlType.kVelocity, ClosedLoopSlot.kSlot0, .0003398478);
     }
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Target RPM", targetRPM);
+        SmartDashboard.putNumber("Target RPM", flywheelController.getSetpoint());
         SmartDashboard.putNumber("Actual RPM", flywheelEncoder.getVelocity());
     }
 

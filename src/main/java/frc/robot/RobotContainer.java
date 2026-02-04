@@ -101,8 +101,7 @@ public class RobotContainer {
         if(Operating.Constants.USING_SHOOTER) {
           controller.rightTrigger().whileTrue(new RunCommand(() -> shooterSub.setRPM(1000), shooterSub));
         }
-
-        if(Operating.Constants.USING_DRIVE) {
+        if(false && Operating.Constants.USING_DRIVE) {
             // 1. Define the target and constraints
             Pose2d targetPose = new Pose2d(10, 5, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(180));
             

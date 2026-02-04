@@ -120,12 +120,12 @@ public final class Configs {
 
         //invert if needed
         static {
-            double FLYWHEEL_FACTOR = 1; //change
+            double FLYWHEEL_FACTOR = 1; //change/delete?
 
             FLYWHEEL_CONFIG
                 .idleMode(IdleMode.kCoast)
                 .smartCurrentLimit(50)
-                .inverted(true); 
+                .inverted(false); 
            
           //  FLYWHEEL_CONFIG.encoder
           //      .positionConversionFactor(FLYWHEEL_FACTOR) //meters
@@ -133,8 +133,7 @@ public final class Configs {
 
             FLYWHEEL_CONFIG.closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                .pid(0.1, 0,0)
-                .apply(new FeedForwardConfig().kV(.05))
+                .pid(0.001, 0, 0.0001)
                 .outputRange(-1, 1)
             .maxMotion
                 // Set MAXMotion parameters for position control - Edit
