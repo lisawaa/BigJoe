@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import frc.robot.Constants.Configs;
 import frc.robot.Constants.Drive;
 import frc.robot.Constants.Drive.Constants.MotorLocation;
@@ -38,40 +39,18 @@ import frc.robot.Constants.IDs;
 import frc.robot.Constants.Operating;
 import frc.robot.Constants.Vision;
 import frc.robot.Constants.Vision.VisionIOInputs;
+import frc.robot.components.SwerveModule;
+import frc.robot.components.SwerveModuleIO;
+import frc.robot.components.SwerveModuleIOSim;
+import frc.robot.components.SwerveModuleIOSparkMax;
+import frc.robot.components.SwerveModuleIOReplay;
 
 public class DriveSubsystem extends SubsystemBase{
     //Creates Swerve Modules
-     private final SwerveModule frontLeft = new SwerveModule(
-        IDs.DriveConstants.FL_DRIVE_ID,
-        IDs.DriveConstants.FL_TURN_ID,
-        Drive.Constants.FL_ANGULAR_OFFSET,
-        Drive.Constants.FL_INVERTED,
-        Configs.SwerveModule.FL_CONFIG,
-        MotorLocation.FRONT_LEFT);
-
-    private final SwerveModule backLeft = new SwerveModule(
-        IDs.DriveConstants.BL_DRIVE_ID,
-        IDs.DriveConstants.BL_TURN_ID,
-        Drive.Constants.BL_ANGULAR_OFFSET,
-        Drive.Constants.BL_INVERTED,
-        Configs.SwerveModule.BL_CONFIG,
-        MotorLocation.BACK_LEFT);
-
-    private final SwerveModule frontRight = new SwerveModule(
-        IDs.DriveConstants.FR_DRIVE_ID,
-        IDs.DriveConstants.FR_TURN_ID,
-        Drive.Constants.FR_ANGULAR_OFFSET,
-        Drive.Constants.FR_INVERTED,
-        Configs.SwerveModule.FR_CONFIG,
-        MotorLocation.FRONT_RIGHT);
-
-    private final SwerveModule backRight = new SwerveModule(
-        IDs.DriveConstants.BR_DRIVE_ID,
-        IDs.DriveConstants.BR_TURN_ID,
-        Drive.Constants.BR_ANGULAR_OFFSET,
-        Drive.Constants.BR_INVERTED,
-        Configs.SwerveModule.BR_CONFIG,
-        MotorLocation.BACK_RIGHT);
+    private SwerveModule frontLeft = null;
+    private SwerveModule frontRight = null;
+    private SwerveModule backLeft = null;  
+    private SwerveModule backRight = null;
 
     private final Pigeon2 gyro = Operating.Constants.USING_GYRO ? new Pigeon2(IDs.DriveConstants.PIGEON_ID) : null;
 
@@ -80,18 +59,60 @@ public class DriveSubsystem extends SubsystemBase{
     private StructArrayPublisher<SwerveModuleState> publisherActualStates = NetworkTableInstance.getDefault().getStructArrayTopic("MyActualStates", SwerveModuleState.struct).publish();
     private StructPublisher<Pose2d> publisherPose = NetworkTableInstance.getDefault().getStructTopic("SwervePose", Pose2d.struct).publish();
  
-    SwerveDriveOdometry odometry = new SwerveDriveOdometry(
-        Drive.Constants.DRIVE_KINEMATICS,
-        getRotation2d(),
-        getSwerveModulePosition());
-
+    SwerveDriveOdometry odometry = null;
     private VisionSubsystem visionIO = null;
-    private SwerveDrivePoseEstimator poseEstimator =
-        new SwerveDrivePoseEstimator(Drive.Constants.DRIVE_KINEMATICS, getRotation2d(), getSwerveModulePosition(), new Pose2d(),
-            Vision.Constants.SINGLE_STD_DEVS, Vision.Constants.SINGLE_STD_DEVS);
+    private SwerveDrivePoseEstimator poseEstimator = null;
     
     //Constructs a new DriveSubsystem
     public DriveSubsystem(Optional<VisionSubsystem> photonVision) {
+        if(Robot.isSimulation())
+        {
+            frontLeft = new SwerveModule(new SwerveModuleIOSim(Drive.Constants.FL_ANGULAR_OFFSET), MotorLocation.FRONT_LEFT);
+            frontRight = new SwerveModule(new SwerveModuleIOSim(Drive.Constants.FR_ANGULAR_OFFSET), MotorLocation.FRONT_RIGHT);
+            backLeft = new SwerveModule(new SwerveModuleIOSim(Drive.Constants.BL_ANGULAR_OFFSET), MotorLocation.BACK_LEFT);
+            backRight = new SwerveModule(new SwerveModuleIOSim(Drive.Constants.BR_ANGULAR_OFFSET), MotorLocation.BACK_RIGHT);
+        }
+        else
+        {
+            frontLeft = new SwerveModule(
+                new SwerveModuleIOSparkMax(
+                    IDs.DriveConstants.FL_DRIVE_ID,
+                    IDs.DriveConstants.FL_TURN_ID,
+                    Drive.Constants.FL_ANGULAR_OFFSET,
+                    Configs.SwerveModule.FL_CONFIG,
+                    Configs.SwerveModule.TURNING_CONFIG),
+                MotorLocation.FRONT_LEFT);
+            frontRight = new SwerveModule(new SwerveModuleIOSparkMax(
+                    IDs.DriveConstants.FR_DRIVE_ID,
+                    IDs.DriveConstants.FR_TURN_ID,
+                    Drive.Constants.FR_ANGULAR_OFFSET,
+                    Configs.SwerveModule.FR_CONFIG,
+                    Configs.SwerveModule.TURNING_CONFIG),
+                MotorLocation.FRONT_RIGHT);
+            backLeft = new SwerveModule(new SwerveModuleIOSparkMax(
+                    IDs.DriveConstants.BL_DRIVE_ID,
+                    IDs.DriveConstants.BL_TURN_ID,
+                    Drive.Constants.BL_ANGULAR_OFFSET,
+                    Configs.SwerveModule.BL_CONFIG,
+                    Configs.SwerveModule.TURNING_CONFIG),
+                MotorLocation.BACK_LEFT);
+            backRight = new SwerveModule(new SwerveModuleIOSparkMax(
+                    IDs.DriveConstants.BR_DRIVE_ID,
+                    IDs.DriveConstants.BR_TURN_ID,
+                    Drive.Constants.BR_ANGULAR_OFFSET,
+                    Configs.SwerveModule.BR_CONFIG,
+                    Configs.SwerveModule.TURNING_CONFIG),
+                 MotorLocation.BACK_RIGHT);
+        }
+
+        odometry = new SwerveDriveOdometry(
+            Drive.Constants.DRIVE_KINEMATICS,
+            getRotation2d(),
+            getSwerveModulePosition());
+        poseEstimator = new SwerveDrivePoseEstimator(Drive.Constants.DRIVE_KINEMATICS, getRotation2d(), getSwerveModulePosition(), new Pose2d(),
+            Vision.Constants.SINGLE_STD_DEVS, Vision.Constants.SINGLE_STD_DEVS);
+
+
         if(photonVision.isEmpty()) {
             visionIO = new VisionSubsystem();
         } else {
@@ -100,7 +121,7 @@ public class DriveSubsystem extends SubsystemBase{
         
         //Usage reporting for MAXSwerve template
         HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
-        RobotConfig config;
+        RobotConfig config = null;
 
         try {
             config = RobotConfig.fromGUISettings();
@@ -236,10 +257,10 @@ public class DriveSubsystem extends SubsystemBase{
 
     //Resests drive encoders to read a position of 0.
     public void resetEncoders() {
-        frontLeft.resetEncoders();
-        frontRight.resetEncoders();
-        backLeft.resetEncoders();
-        backRight.resetEncoders();
+        frontLeft.resetDriveEncoder();
+        frontRight.resetDriveEncoder();
+        backLeft.resetDriveEncoder();
+        backRight.resetDriveEncoder();
     }
 
     //Zereos the heading of the robot.
@@ -293,11 +314,6 @@ public class DriveSubsystem extends SubsystemBase{
             //updateWheelPositions - add for extra debugging functionality
             publisherDesieredStates.set(desiredStates);
             publisherActualStates.set(getSwerveModuleState());
-
-            frontLeft.updateSmartDashboard();
-            frontRight.updateSmartDashboard();
-            backLeft.updateSmartDashboard();
-            backRight.updateSmartDashboard();
         }
         if(Operating.Constants.USING_VISION) {
             poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getRotation2d(), getSwerveModulePosition());
