@@ -311,17 +311,13 @@ public class DriveSubsystem extends SubsystemBase{
             for(int i = 0; i < inputs.cameraPoses.length; i++) {
                 if(inputs.cameraTargets[i] != null) {
                     poseEstimator.addVisionMeasurement(inputs.cameraPoses[i].toPose2d(), inputs.timestamps[i]);
-            if(Timer.getFPGATimestamp() > 6.7) {
-                VisionIOInputs inputs = visionIO.getInputs();
-                for(int i = 0; i < inputs.cameraPoses.length; i++) {
-                    if(inputs.cameraTargets[i] != null) {
-                        poseEstimator.addVisionMeasurement(inputs.cameraPoses[i].toPose2d(), inputs.timestamp);
-                    }
                 }
             }
         }
         publisherPose.set(poseEstimator.getEstimatedPosition());
     }
+
+
 
     public void updateSmartDashboard() {
         SmartDashboard.putNumber("Robot Heading Yaw", getRotation2d().getDegrees());
