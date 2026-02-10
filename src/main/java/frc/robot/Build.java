@@ -7,13 +7,13 @@ public final class Build {
 	public static final String MAVEN_GROUP = "";
 	public static final String MAVEN_NAME = "BigJoe-4";
 	public static final String VERSION = "unspecified";
-	public static final int GIT_REVISION = 21;
-	public static final String GIT_SHA = "519c9830a80c759e06d6f126c4db3f439182fdd7";
-	public static final String GIT_DATE = "2026-02-04T00:29:46Z";
-	public static final String GIT_BRANCH = "main";
-	public static final String BUILD_DATE = "2026-02-07T01:45:23Z";
-	public static final long BUILD_UNIX_TIME = 1770428723384L;
-	public static final int DIRTY = 1;
+	public static final int GIT_REVISION = 22;
+	public static final String GIT_SHA = "71343a36beae9d3d74bc7783c575aa4367f587d2";
+	public static final String GIT_DATE = "2026-02-10T23:35:49Z";
+	public static final String GIT_BRANCH = "Logging";
+	public static final String BUILD_DATE = "2026-02-10T23:50:15Z";
+	public static final long BUILD_UNIX_TIME = 1770767415878L;
+	public static final int DIRTY = 0;
 
 	private Build(){}
 }

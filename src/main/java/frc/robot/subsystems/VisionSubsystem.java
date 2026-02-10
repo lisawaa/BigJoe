@@ -101,7 +101,7 @@ public class VisionSubsystem extends SubsystemBase {
 
             //Log each tracked April Tag ID
             if (visionInputs.cameraTargets[i] != null) {
-                for (int t = 0; t < visionInputs.cameraTargets[i].size(); ++t) {
+                for (int t = 0; t < visionInputs.cameraTargets[i].size(); t++) {
                     int id = visionInputs.cameraTargets[i].get(t).getFiducialId();
                     Logger.recordOutput("Vision/Camera" + (i+1) + "/Tag" + t + "/ID", id);
                 }
