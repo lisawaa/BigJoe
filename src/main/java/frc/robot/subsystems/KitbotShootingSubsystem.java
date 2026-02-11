@@ -11,7 +11,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class KitbotShootingSubsystem extends SubsystemBase{
+public class KitbotShootingSubsystem extends SubsystemBase {
     private SparkMax shootingMotor;
 
     public KitbotShootingSubsystem() {
