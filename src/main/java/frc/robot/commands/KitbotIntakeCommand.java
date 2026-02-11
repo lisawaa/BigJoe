@@ -10,12 +10,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import static frc.robot.Constants.Intake.IntakeConstants.*;
 
 
-public final class IntakeCommand extends Command {
+public final class KitbotIntakeCommand extends Command {
 
   private final KitbotIntakeSubsystem m_intakeSubsystem;
 
   /** Example static factory for an autonomous command. */
-  public IntakeCommand(KitbotIntakeSubsystem intakeSub) {
+  public KitbotIntakeCommand(KitbotIntakeSubsystem intakeSub) {
     this.m_intakeSubsystem = intakeSub;
     addRequirements(m_intakeSubsystem);
   }

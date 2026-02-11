@@ -6,5 +6,15 @@ public final class shared {
         public static final int DRIVER_CONTROLLER_PART = 0;  
 
         public static final boolean USING_INTAKE = true; 
+
+        public enum RobotMode{
+            IDLE,
+            SHOOTING_PREP,
+            SHOOTING,
+            INTAKING_PREP,
+            INTAKING
+        }
     }
+
+    
 }
