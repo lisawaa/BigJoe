@@ -3,6 +3,8 @@ package frc.robot.subsystems;
 import java.util.Optional;
 
 import org.littletonrobotics.junction.Logger;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -28,6 +30,7 @@ import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -64,7 +67,10 @@ public class DriveSubsystem extends SubsystemBase{
     SwerveDriveOdometry odometry = null;
     private VisionSubsystem visionIO = null;
     private SwerveDrivePoseEstimator poseEstimator = null;
-    
+    private double lastMatchLog = 0.0;
+    private boolean lastTeleopEnabled = false;
+    private boolean lastAutonomousEnabled = false;
+
     //Constructs a new DriveSubsystem
     public DriveSubsystem(Optional<VisionSubsystem> photonVision) {
         if(photonVision.isEmpty()) {
@@ -266,6 +272,43 @@ public class DriveSubsystem extends SubsystemBase{
 
     @Override
     public void periodic() {
+        //Logging Drive Outputs
+        Logger.recordOutput("Drive/Pose", poseEstimator.getEstimatedPosition());
+        Logger.recordOutput("Drive/Pose/X", poseEstimator.getEstimatedPosition().getX());
+        Logger.recordOutput("Drive/Pose/Y", poseEstimator.getEstimatedPosition().getY());
+        Logger.recordOutput("Drive/Pose/Rotation", poseEstimator.getEstimatedPosition().getRotation().getDegrees());
+
+        if (Operating.Constants.USING_GYRO) {
+            Logger.recordOutput("Drive/Gyro/Yaw", gyro.getYaw().getValue());
+            Logger.recordOutput("Drive/Gyro/Pitch", gyro.getPitch().getValue());
+            Logger.recordOutput("Drive/Gyro/Roll", gyro.getRoll().getValue());
+        }
+
+        Logger.recordOutput("Drive/ModuleStates/Desired", desiredStates);
+        Logger.recordOutput("Drive/ModuleStates/Actual", getSwerveModuleState());
+
+        //Logging Battery Voltage
+        Logger.recordOutput("Power/BatteryVoltage", RobotController.getBatteryVoltage());
+
+        //Logging Match Time (throttled)
+        double now = Timer.getFPGATimestamp();
+        if (now - lastMatchLog > 0.2) {
+            lastMatchLog = now;
+            Logger.recordOutput("Match/TimeRemaining", DriverStation.getMatchTime());
+        }
+
+        // Log teleop/autonomous enable state on changes
+        boolean teleop = DriverStation.isTeleopEnabled();
+        boolean auton = DriverStation.isAutonomousEnabled();
+        if (teleop != lastTeleopEnabled || auton != lastAutonomousEnabled) {
+            lastTeleopEnabled = teleop;
+            lastAutonomousEnabled = auton;
+            Logger.recordOutput("Match/TeleopEnabled", teleop);
+            Logger.recordOutput("Match/AutonomousEnabled", auton);
+            String mode = auton ? "Autonomous" : teleop ? "Teleop" : "Disabled";
+            Logger.recordOutput("Match/Mode", mode);
+        }
+
         odometry.update(getRotation2d(), getSwerveModulePosition());
         poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getRotation2d(), getSwerveModulePosition());
 
@@ -284,6 +327,7 @@ public class DriveSubsystem extends SubsystemBase{
                 }
             }
         }
+        
         publisherPose.set(poseEstimator.getEstimatedPosition());
     }
 

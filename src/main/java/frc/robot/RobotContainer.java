@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -68,19 +69,34 @@ public class RobotContainer {
     if(Operating.Constants.USING_DRIVE) {
       driveSub = new DriveSubsystem(Optional.ofNullable(visionSub));
       driveSub.setDefaultCommand(new RunCommand(
-        () -> driveSub.drive(
-                  OI.Constants.DRIVER_AXIS_Y_INVERTED * MathUtil.applyDeadband(controller.getRawAxis(OI.Constants.DRIVER_AXIS_Y), OI.Constants.DRIVE_DEADBAND),
-                  OI.Constants.DRIVER_AXIS_X_INVERTED * MathUtil.applyDeadband(controller.getRawAxis(OI.Constants.DRIVER_AXIS_X), OI.Constants.DRIVE_DEADBAND),
-                  OI.Constants.DRIVER_AXIS_ROT_INVERTED * MathUtil.applyDeadband(controller.getRawAxis(OI.Constants.DRIVER_AXIS_ROT), OI.Constants.DRIVE_DEADBAND), 
-                  true,
-                  "Default / Field Oriented"
-        ),
+        () -> {
+          double y = OI.Constants.DRIVER_AXIS_Y_INVERTED * MathUtil.applyDeadband(controller.getRawAxis(OI.Constants.DRIVER_AXIS_Y), OI.Constants.DRIVE_DEADBAND);
+          double x = OI.Constants.DRIVER_AXIS_X_INVERTED * MathUtil.applyDeadband(controller.getRawAxis(OI.Constants.DRIVER_AXIS_X), OI.Constants.DRIVE_DEADBAND);
+          double rot = OI.Constants.DRIVER_AXIS_ROT_INVERTED * MathUtil.applyDeadband(controller.getRawAxis(OI.Constants.DRIVER_AXIS_ROT), OI.Constants.DRIVE_DEADBAND);
+
+          // Record operator inputs with the project logger
+          Logger.recordOutput("Operator/Drive/Y", y);
+          Logger.recordOutput("Operator/Drive/X", x);
+
+          //Add logging for buttons
+
+          Logger.recordOutput("Operator/Drive/Rot", rot);
+          Logger.recordOutput("Operator/Drive/LeftTrigger", controller.leftTrigger().getAsBoolean());
+          Logger.recordOutput("Operator/Drive/RightTrigger", controller.rightTrigger().getAsBoolean());
+
+          driveSub.drive(y, x, rot, true, "Default / Field Oriented"); // CHECK LATER
+        },
         driveSub));
     }
     if(Operating.Constants.USING_SHOOTER) {
       shooterSub = new ShooterSubsystem();
       shooterSub.setDefaultCommand(new RunCommand(
-        () -> shooterSub.setRPM(0), shooterSub));
+        () -> {
+          // Record shooter-related operator inputs
+          Logger.recordOutput("Operator/Shooter/RightTrigger", controller.rightTrigger().getAsBoolean());
+          // Default behavior: hold RPM at 0 when not commanded
+          shooterSub.setRPM(0);
+        }, shooterSub));
     } 
     // extend if-else chain for other subsystems
   }

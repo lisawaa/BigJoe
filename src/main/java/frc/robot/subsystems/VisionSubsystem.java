@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -90,6 +91,23 @@ public class VisionSubsystem extends SubsystemBase {
             } else {
                 visionInputs.cameraPoses[i] = estimatedPose.get().estimatedPose;
                 visionInputs.cameraTargets[i] = estimatedPose.get().targetsUsed;
+            }
+            Logger.recordOutput("Vision/Camera" + (i+1) + "/HasTarget", visionInputs.cameraTargets[i] != null);
+            Logger.recordOutput("Vision/Camera" + (i+1) + "/TagCount", visionInputs.cameraTargets[i] != null ? visionInputs.cameraTargets[i].size() : 0);
+            Logger.recordOutput("Vision/Camera" + (i+1) + "/Pose", visionInputs.cameraPoses[i]);
+            Logger.recordOutput("Vision/Camera" + (i+1) + "/Timestamps", visionInputs.timestamps[i]);
+            Logger.recordOutput("Vision/Camera" + (i+1) + "/DistanceToHub", visionInputs.cameraTargets[i] != null && !visionInputs.cameraTargets[i].isEmpty() ? 
+                visionInputs.cameraTargets[i].get(0).getBestCameraToTarget().getTranslation().getNorm() : 0.0);
+
+            //Log each tracked April Tag ID
+            if (visionInputs.cameraTargets[i] != null) {
+                for (int t = 0; t < visionInputs.cameraTargets[i].size(); t++) {
+                    int id = visionInputs.cameraTargets[i].get(t).getFiducialId();
+                    Logger.recordOutput("Vision/Camera" + (i+1) + "/Tag" + t + "/ID", id);
+                }
+            } else {
+                // Optionally clear indices if you expect a fixed number of slots
+                Logger.recordOutput("Vision/Camera" + (i+1) + "/Tag0/ID", -1);
             }
         }
     }

@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
@@ -67,6 +69,10 @@ public class ClimbSubsystem extends SubsystemBase{
     public void periodic () {
         SmartDashboard.putNumber("Inner Encoder: ", Climb.Constants.INNER_ENCODER_REVERSED * innerEncoder.getPosition());
         SmartDashboard.putNumber("Outer Encoder: ", Climb.Constants.OUTER_ENCODER_REVERSED * outerEncoder.getPosition());
+        //Add limit switches and whether robot is in climb range
+
+        Logger.recordOutput("Climb/Position/Inner", Climb.Constants.INNER_ENCODER_REVERSED * innerEncoder.getPosition());
+        Logger.recordOutput("Climb/Position/Outer", Climb.Constants.OUTER_ENCODER_REVERSED * outerEncoder.getPosition());
         //Add limit switches and whether robot is in climb range
     }
 }

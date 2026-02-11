@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
@@ -35,6 +37,20 @@ public class ShooterSubsystem extends SubsystemBase{
     public void periodic() {
         SmartDashboard.putNumber("Target RPM", flywheelController.getSetpoint());
         SmartDashboard.putNumber("Actual RPM", flywheelEncoder.getVelocity());
+
+        //Logging Target vs Actual RPM
+        Logger.recordOutput("Shooter/TargetRPM", flywheelController.getSetpoint());
+        Logger.recordOutput("Shooter/ActualRPM", flywheelEncoder.getVelocity());
+
+        //Logging Shooter Motor Current
+        Logger.recordOutput("Shooter/Flywheel/Current", flywheel.getOutputCurrent());
+
+        //Logging Shooter Motor Temperature
+        Logger.recordOutput("Shooter/Flywheel/Temperature", flywheel.getMotorTemperature());
+
+        //Logging Shooter Fuel Sensor (Might not be applicable)
+        
+
     }
 
 }
