@@ -2,8 +2,6 @@ package frc.robot.components;
 
 import org.littletonrobotics.junction.AutoLog;
 
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-
 public interface PIDMotorIO {
      /** Inputs from the drive motor */
     @AutoLog

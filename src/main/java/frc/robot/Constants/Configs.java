@@ -158,6 +158,8 @@ public final class Configs {
 
     public static final class Shooter {
         public static final SparkMaxConfig FLYWHEEL_CONFIG = new SparkMaxConfig();
+        public static final SparkMaxConfig SECONDARY_CONFIG = new SparkMaxConfig();
+
 
         //invert if needed
         static {
@@ -174,11 +176,40 @@ public final class Configs {
 
             FLYWHEEL_CONFIG.closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                .pid(0.001, 0, 0.0001)
+                .pid(0.0004, 0, 0)
                 .outputRange(-1, 1)
             .maxMotion
                 // Set MAXMotion parameters for position control - Edit
                 .allowedProfileError(100);
+
+            SECONDARY_CONFIG
+                .idleMode(IdleMode.kCoast)
+                .inverted(true)
+                .smartCurrentLimit(50)
+                .inverted(false);
         }
     }
+
+    public static final class Intake {
+        public static final SparkMaxConfig INTAKE_CONFIG = new SparkMaxConfig();
+        public static final SparkMaxConfig ROTATE_CONFIG = new SparkMaxConfig();
+
+
+        //invert if needed
+        static {
+            INTAKE_CONFIG
+                .idleMode(IdleMode.kCoast)
+                .smartCurrentLimit(50);
+            INTAKE_CONFIG
+                .idleMode(IdleMode.kCoast)
+                .smartCurrentLimit(50);
+            ROTATE_CONFIG
+                .idleMode(IdleMode.kBrake)
+                .smartCurrentLimit(50);
+            ROTATE_CONFIG
+                .idleMode(IdleMode.kBrake)
+                .smartCurrentLimit(50);
+        }
+    }
+
 }

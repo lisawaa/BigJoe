@@ -115,7 +115,7 @@ public class RobotContainer {
             driveSub));
         }
         if(Operating.Constants.USING_SHOOTER) {
-          controller.rightTrigger().whileTrue(new RunCommand(() -> shooterSub.setRPM(1000), shooterSub));
+          controller.rightTrigger().whileTrue(new RunCommand(() -> shooterSub.setRPM(1500), shooterSub));
         }
         if(false && Operating.Constants.USING_DRIVE) {
             // 1. Define the target and constraints

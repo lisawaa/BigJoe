@@ -2,55 +2,55 @@ package frc.robot.subsystems;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.revrobotics.PersistMode;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.ResetMode;
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Configs.Shooter;
 import frc.robot.Constants.IDs.ShooterConstants;
+import frc.robot.components.PIDMotor;
+import frc.robot.components.PIDMotorIOSparkMax;
 
 public class ShooterSubsystem extends SubsystemBase{
     
-    private final SparkMax flywheel;
-    private final RelativeEncoder flywheelEncoder;
-    private final SparkClosedLoopController flywheelController;
+    private final PIDMotor flywheel;
+    private final PIDMotor secondary; //temp
 
     public ShooterSubsystem() {
-        flywheel = new SparkMax(ShooterConstants.FLYWHEEL_ID, MotorType.kBrushless);
-        flywheel.configure(Shooter.FLYWHEEL_CONFIG, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        flywheelEncoder = flywheel.getEncoder();
-        flywheelController = flywheel.getClosedLoopController();
+        flywheel = new PIDMotor(new PIDMotorIOSparkMax(ShooterConstants.FLYWHEEL_ID, Shooter.FLYWHEEL_CONFIG));
+        secondary = new PIDMotor(new PIDMotorIOSparkMax(ShooterConstants.SECONDARY_ID, Shooter.SECONDARY_CONFIG));
     }
 
     public void setRPM(double rpm) {
-        flywheelController.setSetpoint(rpm, ControlType.kVelocity, ClosedLoopSlot.kSlot0, .0003398478);
+        flywheel.setVelocity(rpm, 0.000031);
+        if(rpm == 0)
+            setSecondary(0);
+        else setSecondary(-0.8);
+    }
+
+    public void setSecondary(double speed) {
+        secondary.set(speed);
+    }
+
+    public void stopMotors() {
+        flywheel.stopMotors();
+        secondary.stopMotors();
     }
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Target RPM", flywheelController.getSetpoint());
-        SmartDashboard.putNumber("Actual RPM", flywheelEncoder.getVelocity());
+        //SmartDashboard.putNumber("Target RPM", flywheelController.getSetpoint());
+        SmartDashboard.putNumber("Actual RPM", flywheel.getRPM());
 
         //Logging Target vs Actual RPM
-        Logger.recordOutput("Shooter/TargetRPM", flywheelController.getSetpoint());
-        Logger.recordOutput("Shooter/ActualRPM", flywheelEncoder.getVelocity());
+        //Logger.recordOutput("Shooter/TargetRPM", flywheelController.getSetpoint());
+        //Logger.recordOutput("Shooter/ActualRPM", flywheelEncoder.getVelocity());
 
         //Logging Shooter Motor Current
-        Logger.recordOutput("Shooter/Flywheel/Current", flywheel.getOutputCurrent());
+        //Logger.recordOutput("Shooter/Flywheel/Current", flywheel.getOutputCurrent());
 
         //Logging Shooter Motor Temperature
-        Logger.recordOutput("Shooter/Flywheel/Temperature", flywheel.getMotorTemperature());
+        //Logger.recordOutput("Shooter/Flywheel/Temperature", flywheel.getMotorTemperature());
 
         //Logging Shooter Fuel Sensor (Might not be applicable)
-        
-
     }
 
 }

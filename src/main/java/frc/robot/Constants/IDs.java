@@ -30,7 +30,8 @@ public class IDs {
     }
 
     public static final class ShooterConstants {
-        public static final int FLYWHEEL_ID = 20;
+        public static final int FLYWHEEL_ID = 21;
+        public static final int SECONDARY_ID = 20;
 
     }
 }

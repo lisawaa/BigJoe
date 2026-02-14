@@ -1,7 +1,6 @@
 package frc.robot.components;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.Drive.Constants.MotorLocation;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -11,7 +10,7 @@ public class PIDMotor extends SubsystemBase {
   private final PIDMotorIOInputsAutoLogged inputs = new PIDMotorIOInputsAutoLogged();
    
   /* Constructs a SwerveModule */
-  public PIDMotor(PIDMotorIO io, MotorLocation location) {
+  public PIDMotor(PIDMotorIO io) {
     this.io = io;
     io.resetEncoder();
   }
@@ -41,6 +40,10 @@ public class PIDMotor extends SubsystemBase {
     io.set(speed);
     //Add logging
 
+  }
+
+  public double getRPM() {
+    return inputs.RPM;
   }
 
   //Stops the motor;

@@ -42,7 +42,7 @@ public class PIDMotorIOSparkMax implements PIDMotorIO {
 
     /** Read the current state (called during periodic update). */
     @Override public void updateInputs(PIDMotorIOInputsAutoLogged inputs) {
-        //not my problem
+        inputs.RPM = encoder.getVelocity();
     }
 
     /** Reset drive encoder to zero. */
