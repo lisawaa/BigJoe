@@ -55,5 +55,4 @@ public class ShooterSubsystem extends SubsystemBase{
 
         //Logging Shooter Fuel Sensor (Might not be applicable)
     }
-
 }

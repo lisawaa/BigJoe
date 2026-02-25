@@ -7,10 +7,12 @@ public class SwerveModuleIOReplay implements SwerveModuleIO {
         // TODO: implement this
     }
     
+    /** Set desired state using hardware closed-loop control. */
     @Override public void setDesiredState(SwerveModuleState state) {
         // TODO: implement this
     }
     
+    /** Reset drive encoder to zero. */
     @Override public void resetDriveEncoder() {
         // TODO: implement this
     }    

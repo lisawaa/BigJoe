@@ -6,6 +6,7 @@ package frc.robot;
 public final class Build {
 	public static final String MAVEN_GROUP = "";
 	public static final String MAVEN_NAME = "BigJoe";
+	public static final String MAVEN_NAME = "BigJoe";
 	public static final String VERSION = "unspecified";
 	public static final int GIT_REVISION = 41;
 	public static final String GIT_SHA = "52af01d94f8246382696ba8bf192d7503ca7815b";

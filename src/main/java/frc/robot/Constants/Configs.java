@@ -193,6 +193,9 @@ public final class Configs {
         public static final SparkMaxConfig INTAKE_CONFIG = new SparkMaxConfig();
         public static final SparkMaxConfig ROTATE_CONFIG = new SparkMaxConfig();
 
+        public static final double INTAKE_MOTOR_SPEED = 5.0; // temporary value
+        public static final double MOTOR_HEIGHT = 5.0; // temporary value
+
         static {
             INTAKE_CONFIG
                 .idleMode(IdleMode.kCoast)
