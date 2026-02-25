@@ -24,15 +24,15 @@ public class Vision {
     public static final class Constants {
         public static final Transform3d[] CAMERA_TO_ROBOT = 
         {
-         new Transform3d(new Translation3d(Units.inchesToMeters(16), Units.inchesToMeters(-8), Units.inchesToMeters(6)), 
-            new Rotation3d(0, Units.degreesToRadians(3), 0)),
-         new Transform3d(new Translation3d(Units.inchesToMeters(16), Units.inchesToMeters(8), Units.inchesToMeters(6)), 
-            new Rotation3d(0, -Units.degreesToRadians(3), 0))
+         new Transform3d(new Translation3d(Units.inchesToMeters(-15), Units.inchesToMeters(-8.75), Units.inchesToMeters(10.5)), 
+            new Rotation3d(0, Units.degreesToRadians(3), Units.degreesToRadians(180))),
+         new Transform3d(new Translation3d(Units.inchesToMeters(-15), Units.inchesToMeters(8.75), Units.inchesToMeters(9.5)), 
+            new Rotation3d(0, -Units.degreesToRadians(3), Units.degreesToRadians(180)))
         };
         public static final AprilTagFieldLayout TARGET_POSES = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 
-        public static final Matrix<N3, N1> SINGLE_STD_DEVS = VecBuilder.fill(0.5, 0.5, 5);
-        public static final Matrix<N3, N1> MULTI_STD_DEVS = VecBuilder.fill(0.5, 0.5, 5);
+        public static final Matrix<N3, N1> SINGLE_STD_DEVS = VecBuilder.fill(0.5, 0.5, 10);
+        public static final Matrix<N3, N1> MULTI_STD_DEVS = VecBuilder.fill(0.5, 0.5, 10);
 
         public static final Pose3d redHubPose = new Pose3d(Units.inchesToMeters(468.56), Units.inchesToMeters(158.32), Units.inchesToMeters(72.0), new Rotation3d());
         public static final Pose3d blueHubPose = new Pose3d(Units.inchesToMeters(152.56), Units.inchesToMeters(158.32),  Units.inchesToMeters(72.0), new Rotation3d());

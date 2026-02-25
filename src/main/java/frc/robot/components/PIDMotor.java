@@ -27,7 +27,7 @@ public class PIDMotor extends SubsystemBase {
   }
 
   public void setVelocity(double RPM, double FF) {
-    io.setSetpoint(RPM, FF);
+    io.setVelocity(RPM, FF);
     Logger.recordOutput("PIDMotor/SetVelocity", RPM);
   }
 

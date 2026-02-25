@@ -161,12 +161,12 @@ public class DriveSubsystem extends SubsystemBase{
         double ySpeedDelivered = ySpeed * Drive.Constants.MAX_METERS_PER_SECOND * multiplier;
 
         Pose2d drivePose = getPose();
-        Translation2d shooterOffsetRobot = new Translation2d(); //Update fpr shooter location
+        Translation2d shooterOffsetRobot = new Translation2d(); //Update fpr shooter location;
         Translation2d shooterOffsetField = shooterOffsetRobot.rotateBy(drivePose.getRotation());
         Translation2d shooterPos = drivePose.getTranslation().plus(shooterOffsetField);
         Rotation2d desiredAngle = Vision.Constants.getHubPose().toPose2d().getTranslation().minus(shooterPos).getAngle();
        
-        double rotDelivered = Drive.Constants.ROTATION_CONTROLLER.calculate(drivePose.getRotation().getRadians(), desiredAngle.getRadians()); 
+        double rotDelivered = Drive.Constants.ROTATION_CONTROLLER.calculate(drivePose.getRotation().getRadians(), desiredAngle.getRadians() + Math.PI); //undo PI for actual 
     
         SwerveModuleState[] swerveModuleStates = Drive.Constants.DRIVE_KINEMATICS.toSwerveModuleStates(
             fieldRelative
@@ -276,7 +276,7 @@ public class DriveSubsystem extends SubsystemBase{
         try {
             var config = RobotConfig.fromGUISettings();
             AutoBuilder.configure(
-                this::getOdometry,   // Supplier of current robot pose
+                this::getPose,   // Supplier of current robot pose
                 this::resetOdometry,         // Consumer for seeding pose against auto
                 this::getRobotRelativeSpeeds, // Supplier of current robot speeds
                 // Consumer of ChassisSpeeds and feedforwards to drive the robot

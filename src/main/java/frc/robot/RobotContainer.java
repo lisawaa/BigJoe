@@ -115,12 +115,14 @@ public class RobotContainer {
         }
 
         if(Operating.Constants.USING_SHOOTER) {
-          controller.rightTrigger().whileTrue(new RunCommand(() -> shooterSub.setRPM(1500), shooterSub));
+          controller.rightTrigger().whileTrue(new RunCommand(() -> shooterSub.setRPM(-2500), shooterSub));
+          controller.rightBumper().whileTrue(new RunCommand(() -> shooterSub.setSecondary(-0.8), shooterSub));
+          controller.rightBumper().whileFalse(new RunCommand(() -> shooterSub.setSecondary(0), shooterSub));
         }
 
-        if(false && Operating.Constants.USING_DRIVE) {
+        if(Operating.Constants.USING_DRIVE) {
             // 1. Define the target and constraints
-            Pose2d targetPose = new Pose2d(10, 5, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(180));
+            Pose2d targetPose = new Pose2d(13.1, 3.9, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(0));
             
             PathConstraints constraints = new PathConstraints(
                 3.0, 4.0,

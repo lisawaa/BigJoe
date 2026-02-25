@@ -19,10 +19,10 @@ public final class Drive {
             new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),   //Back Left
             new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2)); //Back Right
 
-        public static final double FL_ANGULAR_OFFSET = 0;
-        public static final double BL_ANGULAR_OFFSET =  0;
+        public static final double FL_ANGULAR_OFFSET = -Math.PI/2;
+        public static final double BL_ANGULAR_OFFSET =  Math.PI;
         public static final double FR_ANGULAR_OFFSET = 0;
-        public static final double BR_ANGULAR_OFFSET = 0;
+        public static final double BR_ANGULAR_OFFSET = Math.PI/2;
 
         public static final boolean FL_INVERTED = false; 
         public static final boolean FR_INVERTED = false; 

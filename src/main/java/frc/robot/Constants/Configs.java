@@ -1,5 +1,6 @@
 package frc.robot.Constants;
 
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.FeedForwardConfig;
@@ -91,7 +92,7 @@ public final class Configs {
             FR_CONFIG
                 .idleMode(IdleMode.kBrake)
                 .smartCurrentLimit(50)
-                .inverted(!false);
+                .inverted(false);
             FR_CONFIG.encoder
                 .positionConversionFactor(DRIVING_FACTOR) //meters
                 .velocityConversionFactor(DRIVING_FACTOR / 60.0);
@@ -117,7 +118,7 @@ public final class Configs {
             BR_CONFIG
                 .idleMode(IdleMode.kBrake)
                 .smartCurrentLimit(50)
-                .inverted(!true);
+                .inverted(false);
             BR_CONFIG.encoder
                 .positionConversionFactor(DRIVING_FACTOR) //meters
                 .velocityConversionFactor(DRIVING_FACTOR / 60.0);
@@ -162,7 +163,8 @@ public final class Configs {
 
             FLYWHEEL_CONFIG
                 .idleMode(IdleMode.kCoast)
-                .smartCurrentLimit(50)
+                .smartCurrentLimit(40)
+                .voltageCompensation(11)
                 .inverted(false); 
            
         //  FLYWHEEL_CONFIG.encoder
@@ -171,10 +173,13 @@ public final class Configs {
 
             FLYWHEEL_CONFIG.closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                .pid(0.0004, 0, 0)
+                .apply(new FeedForwardConfig().kV(.0001869)) // ~1/MAX_RPM  .00020352
+                //.p(0.00025) //.00078
+                .d(0.25)//d can't be neg
                 .outputRange(-1, 1)
             .maxMotion
-                .allowedProfileError(100);
+                .allowedProfileError(0)
+                .maxAcceleration(5000);
 
             SECONDARY_CONFIG
                 .idleMode(IdleMode.kCoast)

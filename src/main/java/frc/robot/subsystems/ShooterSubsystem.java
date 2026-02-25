@@ -20,10 +20,12 @@ public class ShooterSubsystem extends SubsystemBase{
     }
 
     public void setRPM(double rpm) {
-        flywheel.setVelocity(rpm, 0.000031);
-        if(rpm == 0)
-            setSecondary(0);
-        else setSecondary(-0.8);
+        if(rpm == 0) // && Math.abs(flywheel.getRPM()) < 200)
+            flywheel.set(0);
+        else
+            flywheel.setVelocity(rpm, 0.00020352); //+ (rpm*0.04)
+        SmartDashboard.putNumber("Desired RPM", rpm);
+        Logger.recordOutput("RPM/Desired", rpm);
     }
 
     public void setSecondary(double speed) {
@@ -39,6 +41,7 @@ public class ShooterSubsystem extends SubsystemBase{
     public void periodic() {
         //SmartDashboard.putNumber("Target RPM", flywheelController.getSetpoint());
         SmartDashboard.putNumber("Actual RPM", flywheel.getRPM());
+        Logger.recordOutput("RPM/Actual", flywheel.getRPM());
 
         //Logging Target vs Actual RPM
         //Logger.recordOutput("Shooter/TargetRPM", flywheelController.getSetpoint());
