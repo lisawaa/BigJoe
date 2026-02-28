@@ -24,9 +24,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StructArrayPublisher;
-import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
@@ -61,11 +58,6 @@ public class DriveSubsystem extends SubsystemBase{
     private double lastMatchLog = 0.0;
     private boolean lastTeleopEnabled = false;
     private boolean lastAutonomousEnabled = false;
-
-    private StructArrayPublisher<SwerveModuleState> publisherDesieredStates = NetworkTableInstance.getDefault().getStructArrayTopic("MyDesiredStates", SwerveModuleState.struct).publish();
-    private StructArrayPublisher<SwerveModuleState> publisherActualStates = NetworkTableInstance.getDefault().getStructArrayTopic("MyActualStates", SwerveModuleState.struct).publish();
-    private StructArrayPublisher<SwerveModulePosition> publisherPositions = NetworkTableInstance.getDefault().getStructArrayTopic("MyPositions", SwerveModulePosition.struct).publish();
-    private StructPublisher<Pose2d> publisherPose = NetworkTableInstance.getDefault().getStructTopic("SwervePose", Pose2d.struct).publish();
 
     public DriveSubsystem(Optional<VisionSubsystem> photonVision) {
         if(Robot.isSimulation()) {
@@ -276,7 +268,7 @@ public class DriveSubsystem extends SubsystemBase{
         try {
             var config = RobotConfig.fromGUISettings();
             AutoBuilder.configure(
-                this::getPose,   // Supplier of current robot pose
+                this::getOdometry,   // Supplier of current robot pose *getPose
                 this::resetOdometry,         // Consumer for seeding pose against auto
                 this::getRobotRelativeSpeeds, // Supplier of current robot speeds
                 // Consumer of ChassisSpeeds and feedforwards to drive the robot
@@ -335,13 +327,6 @@ public class DriveSubsystem extends SubsystemBase{
         odometry.update(getRotation2d(), getSwerveModulePosition());
         poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getRotation2d(), getSwerveModulePosition());
 
-        if(Operating.Debugging.DRIVE_DEBUG) {
-            updateSmartDashboard();
-            publisherDesieredStates.set(desiredStates);
-            publisherActualStates.set(getSwerveModuleState());
-            publisherPositions.set(getSwerveModulePosition());
-        }
-
         if(Operating.Constants.USING_VISION) {
             VisionIOInputs inputs = visionIO.getInputs();
             for(int i = 0; i < inputs.cameraPoses.length; i++) {
@@ -350,8 +335,6 @@ public class DriveSubsystem extends SubsystemBase{
                 }
             }
         }
-        
-        publisherPose.set(poseEstimator.getEstimatedPosition());
     }
 
     public void updateSmartDashboard() {

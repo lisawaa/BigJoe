@@ -47,7 +47,7 @@ public class RobotContainer {
     initSubystems();
 
     if(Operating.Constants.USING_DRIVE){
-      autoChooser = AutoBuilder.buildAutoChooser("1");
+      autoChooser = AutoBuilder.buildAutoChooser();
       //Add paths here
       autoChooser.addOption("1", new PathPlannerAuto("1"));      
       autoChooser.addOption("2", new PathPlannerAuto("2")); 
