@@ -41,11 +41,11 @@ public class VisionSubsystem extends SubsystemBase {
     public VisionSubsystem() {
         PortForwarder.add(5810, "10.44.70.11", 5800);
 
-        cameras.add(new PhotonCamera("camera1"));
+        cameras.add(new PhotonCamera("camera3"));
         cameraEstimators.add(new PhotonPoseEstimator(Vision.Constants.TARGET_POSES, 
             PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, Vision.Constants.CAMERA_TO_ROBOT[0]));
 
-        cameras.add(new PhotonCamera("camera2"));
+        cameras.add(new PhotonCamera("camera4"));
         cameraEstimators.add(new PhotonPoseEstimator(Vision.Constants.TARGET_POSES,
              PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, Vision.Constants.CAMERA_TO_ROBOT[1]));
     }
@@ -76,6 +76,7 @@ public class VisionSubsystem extends SubsystemBase {
         visionInputs.cameraPoses = new Pose3d[numberOfCameras];
         visionInputs.cameraTargets = new List[numberOfCameras];
         visionInputs.timestamps = new double[numberOfCameras];
+        visionInputs.ambiguity = new double[numberOfCameras];
         for(int i = 0; i < cameras.size(); ++i) {
             visionInputs.timestamps[i] = 0.0;
             PhotonCamera camera = cameras.get(i);

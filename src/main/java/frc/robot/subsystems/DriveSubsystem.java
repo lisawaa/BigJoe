@@ -268,7 +268,7 @@ public class DriveSubsystem extends SubsystemBase{
         try {
             var config = RobotConfig.fromGUISettings();
             AutoBuilder.configure(
-                this::getOdometry,   // Supplier of current robot pose *getPose
+                this::getPose,   // Supplier of current robot pose *getPose
                 this::resetOdometry,         // Consumer for seeding pose against auto
                 this::getRobotRelativeSpeeds, // Supplier of current robot speeds
                 // Consumer of ChassisSpeeds and feedforwards to drive the robot

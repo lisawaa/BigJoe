@@ -49,4 +49,8 @@ public class PIDMotor extends SubsystemBase {
     io.stopMotors();
     Logger.recordOutput("PIDMotor/StopMotors", true);
   }
+
+  public void resetEncoder() {
+    io.resetEncoder();
+  }
 }

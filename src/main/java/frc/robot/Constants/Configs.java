@@ -142,8 +142,8 @@ public final class Configs {
                 .smartCurrentLimit(50);
             INNER_RIGHT_CONFIG
                 .idleMode(IdleMode.kBrake)
-                .smartCurrentLimit(50)
-                .follow(IDs.ClimbConstants.INNER_LEFT_ID);
+                .smartCurrentLimit(50);
+                //.follow(IDs.ClimbConstants.INNER_LEFT_ID);
             OUTER_LEFT_CONFIG
                 .idleMode(IdleMode.kBrake)
                 .smartCurrentLimit(50);

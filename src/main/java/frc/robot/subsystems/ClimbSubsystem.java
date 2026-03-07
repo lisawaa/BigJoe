@@ -13,66 +13,49 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Climb;
 import frc.robot.Constants.Configs;
 import frc.robot.Constants.IDs;
+import frc.robot.components.PIDMotor;
+import frc.robot.components.PIDMotorIOSparkMax;
 
 public class ClimbSubsystem extends SubsystemBase{
     
-    private final SparkMax innerLeft;
-    private final SparkMax innerRight;
-    private final SparkMax outerLeft;
-    private final SparkMax outerRight;
-
-    private final RelativeEncoder innerEncoder;
-    private final RelativeEncoder outerEncoder;
+    private final PIDMotor innerLeft;
+    private final PIDMotor innerRight;
+    
+    //private final SparkMax outerLeft;
+    //private final SparkMax outerRight;
 
     //add limit switches?
     public ClimbSubsystem() {
-        innerLeft = new SparkMax(IDs.ClimbConstants.INNER_LEFT_ID, MotorType.kBrushless);
-        innerRight = new SparkMax(IDs.ClimbConstants.INNER_RIGHT_ID, MotorType.kBrushless);
-        outerLeft = new SparkMax(IDs.ClimbConstants.OUTER_LEFT_ID, MotorType.kBrushless);
-        outerRight = new SparkMax(IDs.ClimbConstants.OUTER_RIGHT_ID, MotorType.kBrushless);
-
-        innerLeft.configure(Configs.Climb.INNER_LEFT_CONFIG, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        innerRight.configure(Configs.Climb.INNER_RIGHT_CONFIG, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        outerLeft.configure(Configs.Climb.OUTER_LEFT_CONFIG, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        outerRight.configure(Configs.Climb.OUTER_RIGHT_CONFIG, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-        innerEncoder = innerLeft.getEncoder();
-        outerEncoder = outerLeft.getEncoder();
+        innerLeft = new PIDMotor(new PIDMotorIOSparkMax(IDs.ClimbConstants.INNER_LEFT_ID, Configs.Climb.INNER_LEFT_CONFIG));
+        innerRight = new PIDMotor(new PIDMotorIOSparkMax(IDs.ClimbConstants.INNER_RIGHT_ID, Configs.Climb.INNER_RIGHT_CONFIG));
         resetEncoders();
     }
 
     public void moveInner(double speed) {
         //if bot-limit switch
         //speed = Math.max(speed, 0) <- prevents motors from impossibly going down
-
         innerLeft.set(speed);
+        innerRight.set(speed);
     }
 
     public void moveOuter(double speed) {
         //if bot-limit switch
         //speed = Math.max(speed, 0) <- prevents motors from impossibly going down
-
-        outerLeft.set(speed);
+        //outerLeft.set(speed);
     }
 
     public void resetEncoders() {
-        innerEncoder.setPosition(0);
-        outerEncoder.setPosition(0);
+        innerLeft.resetEncoder();
+        innerRight.resetEncoder();
     }
 
     public void stop() {
-        innerLeft.stopMotor();
-        outerLeft.stopMotor();
+        innerLeft.stopMotors();
+        innerRight.stopMotors();
     }
 
     @Override
     public void periodic () {
-        SmartDashboard.putNumber("Inner Encoder: ", Climb.Constants.INNER_ENCODER_REVERSED * innerEncoder.getPosition());
-        SmartDashboard.putNumber("Outer Encoder: ", Climb.Constants.OUTER_ENCODER_REVERSED * outerEncoder.getPosition());
-        //Add limit switches and whether robot is in climb range
 
-        Logger.recordOutput("Climb/Position/Inner", Climb.Constants.INNER_ENCODER_REVERSED * innerEncoder.getPosition());
-        Logger.recordOutput("Climb/Position/Outer", Climb.Constants.OUTER_ENCODER_REVERSED * outerEncoder.getPosition());
-        //Add limit switches and whether robot is in climb range
     }
 }

@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OI;
 import frc.robot.Constants.Operating;
+import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
@@ -37,6 +38,7 @@ public class RobotContainer {
   private DriveSubsystem driveSub;
   private VisionSubsystem visionSub;
   private ShooterSubsystem shooterSub;
+  private ClimbSubsystem climbSub;
 
   private final CommandXboxController controller =
       new CommandXboxController(OI.Constants.DRIVE_CONTROLLER_PORT);
@@ -97,6 +99,14 @@ public class RobotContainer {
         }, shooterSub));
     } 
 
+    if(Operating.Constants.USING_CLIMB) {
+      climbSub = new ClimbSubsystem();
+      climbSub.setDefaultCommand(new RunCommand(
+        () -> {
+          climbSub.moveInner(0);        
+        }, climbSub));
+    } 
+
     // extend if-else chain for other subsystems
   }
 
@@ -114,6 +124,11 @@ public class RobotContainer {
             driveSub));
         }
 
+        if(Operating.Constants.USING_CLIMB) {
+          controller.x().whileTrue(new RunCommand(() -> climbSub.moveInner(0.1), climbSub));
+          controller.y().whileTrue(new RunCommand(() -> climbSub.moveInner(-0.1), climbSub));
+        }
+
         if(Operating.Constants.USING_SHOOTER) {
           controller.rightTrigger().whileTrue(new RunCommand(() -> shooterSub.setRPM(-2500), shooterSub));
           controller.rightBumper().whileTrue(new RunCommand(() -> shooterSub.setSecondary(-0.8), shooterSub));
@@ -122,12 +137,12 @@ public class RobotContainer {
 
         if(Operating.Constants.USING_DRIVE) {
             // 1. Define the target and constraints
-            Pose2d targetPose = new Pose2d(13.1, 3.9, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(0));
+            Pose2d targetPose = new Pose2d(15.2, 3.6, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(180));
             
             PathConstraints constraints = new PathConstraints(
-                3.0, 4.0,
-                Units.degreesToRadians(540), 
-                Units.degreesToRadians(720));
+                3.0, 5.0,
+                Units.degreesToRadians(240), 
+                Units.degreesToRadians(240));
 
             // 2. Bind to a button (e.g., the B button)
             controller.b().whileTrue(
