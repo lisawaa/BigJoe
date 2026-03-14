@@ -8,13 +8,15 @@ import frc.robot.Constants.States.RobotMode;
 
 public class Superstructure {
     private final IntakeSubsystem intakeSubsystem;
+    private final ShooterSubsystem shooterSubsystem;
     private RobotMode currentMode;
     private RobotMode targetMode;
     private GameMode gameMode;
     private boolean hubActive;
 
-    public Superstructure(IntakeSubsystem intakeSubsystem) {
+    public Superstructure(IntakeSubsystem intakeSubsystem, ShooterSubsystem shooterSubsystem) {
         this.intakeSubsystem = intakeSubsystem;
+        this.shooterSubsystem = shooterSubsystem;
         hubActive = false;
         currentMode = RobotMode.IDLE;
         targetMode = RobotMode.IDLE;
@@ -114,22 +116,21 @@ public class Superstructure {
     }
 
     public void handleIntakingPrepMode() {
-        
-        // intakeSubsystem.setIntakeRPM(0); ask
         // intakeSubsystem.setRotateRPMForward(0); ask
     }
 
     public void handleIntakingMode() {
+        handleIntakingPrepMode();
         double goal = 0.0;
         // intakeSubsystem.setIntakeRPM(0); ask
-        // intakeSubsystem.setRotateRPMForward(0); ask
     }
 
     public void handleShootingPrepMode() {
-        
+        //shooterSubsystem.setSecondary(0);
     }
 
     public void handleShootingMode() {
-        
+        handleShootingPrepMode();
+        //shooterSubsystem.setRPM(0); 
     }
 }

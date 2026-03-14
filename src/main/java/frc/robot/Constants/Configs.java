@@ -1,5 +1,7 @@
 package frc.robot.Constants;
 
+import java.awt.geom.Point2D;
+
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -157,6 +159,12 @@ public final class Configs {
     public static final class Shooter {
         public static final SparkMaxConfig FLYWHEEL_CONFIG = new SparkMaxConfig();
         public static final SparkMaxConfig SECONDARY_CONFIG = new SparkMaxConfig();
+        public static final Point2D points[] = {
+            new Point2D.Double(0, 0), // placeholder values
+            new Point2D.Double(1, 1000),
+            new Point2D.Double(2, 2000),
+            new Point2D.Double(3, 3000)
+        };
 
         static {
             double FLYWHEEL_FACTOR = 1; 
@@ -187,6 +195,7 @@ public final class Configs {
                 .smartCurrentLimit(50)
                 .inverted(false);
         }
+
     }
 
     public static final class Intake {
