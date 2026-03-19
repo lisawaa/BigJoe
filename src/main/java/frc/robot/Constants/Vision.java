@@ -24,10 +24,10 @@ public class Vision {
     public static final class Constants {
         public static final Transform3d[] CAMERA_TO_ROBOT = 
         {
-         new Transform3d(new Translation3d(Units.inchesToMeters(15), Units.inchesToMeters(12), Units.inchesToMeters(15.5)), 
-            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(3), Units.degreesToRadians(0))),
-         new Transform3d(new Translation3d(Units.inchesToMeters(15), Units.inchesToMeters(-12), Units.inchesToMeters(15.5)), 
-            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(3), Units.degreesToRadians(0)))
+         new Transform3d(new Translation3d(Units.inchesToMeters(.5), Units.inchesToMeters(-.25), Units.inchesToMeters(28)), 
+            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(18), Units.degreesToRadians(0))),
+         new Transform3d(new Translation3d(Units.inchesToMeters(-13.75), Units.inchesToMeters(-.75), Units.inchesToMeters(19.5)), 
+            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(180)))
         };
         public static final AprilTagFieldLayout TARGET_POSES = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 

@@ -41,11 +41,11 @@ public class VisionSubsystem extends SubsystemBase {
     public VisionSubsystem() {
         PortForwarder.add(5810, "10.44.70.11", 5800);
 
-        cameras.add(new PhotonCamera("camera3"));
+        cameras.add(new PhotonCamera("PV1"));
         cameraEstimators.add(new PhotonPoseEstimator(Vision.Constants.TARGET_POSES, 
             PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, Vision.Constants.CAMERA_TO_ROBOT[0]));
 
-        cameras.add(new PhotonCamera("camera4"));
+        cameras.add(new PhotonCamera("PV2"));
         cameraEstimators.add(new PhotonPoseEstimator(Vision.Constants.TARGET_POSES,
              PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, Vision.Constants.CAMERA_TO_ROBOT[1]));
     }

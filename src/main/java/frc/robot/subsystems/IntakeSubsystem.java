@@ -18,16 +18,16 @@ public class IntakeSubsystem extends SubsystemBase {
         rotateMotor = new PIDMotor(new PIDMotorIOSparkMax(IntakeConstants.ROTATE_ID, Intake.ROTATE_CONFIG));
     }
 
-    public void setIntakeRPM(double rpm) {
-        intakeMotor.setVelocity(rpm, 0.000031);
+    public void setIntake(double speed) {
+        intakeMotor.set(speed);
     }
 
-    public void setRotateRPMForward(double rpm) {
-        rotateMotor.setVelocity(rpm, 0.000031);
+    public void extend() {
+        rotateMotor.setSetpoint(14.643, 0);
     }
 
-    public void setRotateRPMBackward(double rpm) {
-        rotateMotor.setVelocity(-rpm, 0.000031);
+    public void retract() {
+        rotateMotor.setSetpoint(-0.8, 0);
     }
 
     public void stopMotors() {
@@ -36,6 +36,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void periodic(){
+        Logger.recordOutput("IntakeSubsystem/Rotate Value", rotateMotor.getEncoder());
         Logger.recordOutput("IntakeSubsystem/IntakeMotorRPM", intakeMotor.getRPM());
         Logger.recordOutput("IntakeSubsystem/RotateMotorRPM", rotateMotor.getRPM());
     }

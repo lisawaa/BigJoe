@@ -14,51 +14,52 @@ import frc.robot.components.PIDMotorIOSparkMax;
 
 public class ShooterSubsystem extends SubsystemBase{
     
-    private final PIDMotor flywheel;
-    private final PIDMotor secondary; //temp
-    private LinearInterpolator rpmInterpolator;
+    private final PIDMotor flywheelRight; //leader
+    private final PIDMotor flywheelLeft;
+    private final PIDMotor feeder; 
+    private final PIDMotor hopper;
+    private double desiredRPM;
+    private LinearInterpolator interpolator;
 
     public ShooterSubsystem() {
-        flywheel = new PIDMotor(new PIDMotorIOSparkMax(ShooterConstants.FLYWHEEL_ID, Shooter.FLYWHEEL_CONFIG));
-        secondary = new PIDMotor(new PIDMotorIOSparkMax(ShooterConstants.SECONDARY_ID, Shooter.SECONDARY_CONFIG));
-        rpmInterpolator = new LinearInterpolator(Shooter.points);
+        flywheelRight = new PIDMotor(new PIDMotorIOSparkMax(ShooterConstants.FLYWHEEL_RIGHT_ID, Shooter.FLYWHEEL_RIGHT_CONFIG));
+        flywheelLeft = new PIDMotor(new PIDMotorIOSparkMax(ShooterConstants.FLYWHEEL_LEFT_ID, Shooter.FLYWHEEL_LEFT_CONFIG));
+        feeder = new PIDMotor(new PIDMotorIOSparkMax(ShooterConstants.FEEDER_ID, Shooter.FEEDER_CONFIG));
+        hopper = new PIDMotor(new PIDMotorIOSparkMax(ShooterConstants.HOPPER_ID, Shooter.HOPPER_CONFIG));
     }
 
-    public void setRPM(double rpm) {
-        if(rpm == 0) // && Math.abs(flywheel.getRPM()) < 200)
-            flywheel.set(0);
-        else
-            flywheel.setVelocity(rpm, 0.00020352); //+ (rpm*0.04)
-            // flywheel.setVelocity(rpm, rpmInterpolator.getOutput());
-        SmartDashboard.putNumber("Desired RPM", rpm);
-        Logger.recordOutput("RPM/Desired", rpm);
+    public void setDesiredRPM(double desiredRPM) {
+        this.desiredRPM = desiredRPM;
+        SmartDashboard.putNumber("Desired RPM", desiredRPM);
+        Logger.recordOutput("Shooter/Desired RPM", desiredRPM);
+
     }
 
-    public void setSecondary(double speed) {
-        secondary.set(speed);
+    public void setFeeder(double speed) {
+        feeder.set(speed);
+        Logger.recordOutput("Shooter/Feeder", speed);
+    }
+
+    public void setHopper(double speed) {
+        hopper.set(speed);
+        Logger.recordOutput("Shooter/Hopper", speed);
     }
 
     public void stopMotors() {
-        flywheel.stopMotors();
-        secondary.stopMotors();
+        flywheelRight.stopMotors();
+        flywheelLeft.stopMotors();
+        feeder.stopMotors();
+        hopper.stopMotors();
     }
 
     @Override
     public void periodic() {
-        //SmartDashboard.putNumber("Target RPM", flywheelController.getSetpoint());
-        SmartDashboard.putNumber("Actual RPM", flywheel.getRPM());
-        Logger.recordOutput("RPM/Actual", flywheel.getRPM());
-
-        //Logging Target vs Actual RPM
-        //Logger.recordOutput("Shooter/TargetRPM", flywheelController.getSetpoint());
-        //Logger.recordOutput("Shooter/ActualRPM", flywheelEncoder.getVelocity());
-
-        //Logging Shooter Motor Current
-        //Logger.recordOutput("Shooter/Flywheel/Current", flywheel.getOutputCurrent());
-
-        //Logging Shooter Motor Temperature
-        //Logger.recordOutput("Shooter/Flywheel/Temperature", flywheel.getMotorTemperature());
-
-        //Logging Shooter Fuel Sensor (Might not be applicable)
+        if(desiredRPM == 0 && Math.abs(flywheelRight.getRPM()) < 150) {
+            flywheelRight.set(0);
+        } else {
+            flywheelRight.setVelocity(desiredRPM, 0.00020352); 
+        }
+        SmartDashboard.putNumber("Actual RPM", flywheelRight.getRPM());
+        Logger.recordOutput("RPM/Actual", flywheelRight.getRPM());
     }
 }

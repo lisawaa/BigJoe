@@ -2,33 +2,34 @@ package frc.robot.Constants;
 
 public class IDs {
     public static final class DriveConstants {
-        public static final int FL_DRIVE_ID = 11; //11 //11
-        public static final int BL_DRIVE_ID = 12; //13 //12
-        public static final int FR_DRIVE_ID = 13; //15 //13
-        public static final int BR_DRIVE_ID = 14; //17 //14
+        public static final int FL_DRIVE_ID = 17; //11
+        public static final int BL_DRIVE_ID = 15; //12
+        public static final int FR_DRIVE_ID = 13; //13
+        public static final int BR_DRIVE_ID = 11; //14
 
-        public static final int FL_TURN_ID = 15;  //10 //15
-        public static final int BL_TURN_ID = 16;  //12 //16
-        public static final int FR_TURN_ID = 17;  //14 //17
-        public static final int BR_TURN_ID = 18;  //16 //18
+        public static final int FL_TURN_ID = 16;  //15
+        public static final int BL_TURN_ID = 14;  //16
+        public static final int FR_TURN_ID = 12;  //17
+        public static final int BR_TURN_ID = 10;  //18
 
-        public static final int PIGEON_ID = 10;   //10
+        public static final int PIGEON_ID = 8;   //10
     }
 
     public static final class ClimbConstants {
-        public static final int INNER_LEFT_ID = 1;  //1
-        public static final int INNER_RIGHT_ID = 2; //2
-        public static final int OUTER_LEFT_ID = 3;  //3
-        public static final int OUTER_RIGHT_ID = 4; //4
+        public static final int CLIMB_LEFT_ID = 22;  //27
+        public static final int CLIMB_RIGHT_ID = 21; //26
+        public static final int CLIMB_LIMIT_ID = 0;
     }
 
      public static final class IntakeConstants {
-        public static final int INTAKE_ID = 5;  //1
-        public static final int ROTATE_ID = 6; //2
+        public static final int INTAKE_ID = 18;  //5
+        public static final int ROTATE_ID = 25; //6
     }
 
     public static final class ShooterConstants {
-        public static final int FLYWHEEL_ID = 21;
-        public static final int SECONDARY_ID = 20;
+        public static final int FLYWHEEL_RIGHT_ID = 19; //21
+        public static final int FLYWHEEL_LEFT_ID = 20;
+        public static final int FEEDER_ID = 23;
+        public static final int HOPPER_ID = 24;
     }
 }

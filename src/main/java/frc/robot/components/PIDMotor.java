@@ -53,4 +53,8 @@ public class PIDMotor extends SubsystemBase {
   public void resetEncoder() {
     io.resetEncoder();
   }
+
+  public double getEncoder() {
+    return io.getEncoder();
+  }
 }

@@ -133,30 +133,25 @@ public final class Configs {
     }
 
     public static final class Climb {
-        public static final SparkMaxConfig INNER_LEFT_CONFIG = new SparkMaxConfig();
-        public static final SparkMaxConfig INNER_RIGHT_CONFIG = new SparkMaxConfig();
-        public static final SparkMaxConfig OUTER_LEFT_CONFIG = new SparkMaxConfig();
-        public static final SparkMaxConfig OUTER_RIGHT_CONFIG = new SparkMaxConfig();
+        public static final SparkMaxConfig LEFT_CONFIG = new SparkMaxConfig();
+        public static final SparkMaxConfig RIGHT_CONFIG = new SparkMaxConfig();
 
         static {
-            INNER_LEFT_CONFIG
+            LEFT_CONFIG
                 .idleMode(IdleMode.kBrake)
                 .smartCurrentLimit(50);
-            INNER_RIGHT_CONFIG
+            RIGHT_CONFIG
                 .idleMode(IdleMode.kBrake)
                 .smartCurrentLimit(50);
-                //.follow(IDs.ClimbConstants.INNER_LEFT_ID);
-            OUTER_LEFT_CONFIG
-                .idleMode(IdleMode.kBrake)
-                .smartCurrentLimit(50);
-            OUTER_RIGHT_CONFIG
-                .idleMode(IdleMode.kBrake)
-                .smartCurrentLimit(50)
-                .follow(IDs.ClimbConstants.OUTER_LEFT_ID);       
+                //.follow(IDs.ClimbConstants.CLIMB_LEFT_ID);
         }
     }
 
     public static final class Shooter {
+        public static final SparkMaxConfig FLYWHEEL_RIGHT_CONFIG = new SparkMaxConfig();
+        public static final SparkMaxConfig FLYWHEEL_LEFT_CONFIG = new SparkMaxConfig();
+        public static final SparkMaxConfig FEEDER_CONFIG = new SparkMaxConfig();
+        public static final SparkMaxConfig HOPPER_CONFIG = new SparkMaxConfig();
         public static final SparkMaxConfig FLYWHEEL_CONFIG = new SparkMaxConfig();
         public static final SparkMaxConfig SECONDARY_CONFIG = new SparkMaxConfig();
         public static final Point2D points[] = {
@@ -167,33 +162,31 @@ public final class Configs {
         };
 
         static {
-            double FLYWHEEL_FACTOR = 1; 
-
-            FLYWHEEL_CONFIG
+            FLYWHEEL_RIGHT_CONFIG
                 .idleMode(IdleMode.kCoast)
-                .smartCurrentLimit(40)
+                .smartCurrentLimit(50)
                 .voltageCompensation(11)
                 .inverted(false); 
-           
-        //  FLYWHEEL_CONFIG.encoder
-        //      .positionConversionFactor(FLYWHEEL_FACTOR) //meters
-        //      .velocityConversionFactor(FLYWHEEL_FACTOR / 60.0);
-
-            FLYWHEEL_CONFIG.closedLoop
+            FLYWHEEL_RIGHT_CONFIG.closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                .apply(new FeedForwardConfig().kV(.0001869)) // ~1/MAX_RPM  .00020352
-                //.p(0.00025) //.00078
+                .apply(new FeedForwardConfig().kV(.0002055)) // ~1/MAX_RPM  .00020352
+                .p(0.00025) //.00078
                 .d(0.25)//d can't be neg
-                .outputRange(-1, 1)
-            .maxMotion
-                .allowedProfileError(0)
-                .maxAcceleration(5000);
-
-            SECONDARY_CONFIG
-                .idleMode(IdleMode.kCoast)
-                .inverted(true)
+                .outputRange(-1, 1);
+            FLYWHEEL_LEFT_CONFIG
+                .idleMode(IdleMode.kCoast)                
                 .smartCurrentLimit(50)
-                .inverted(false);
+                .voltageCompensation(11)
+                .follow(IDs.ShooterConstants.FLYWHEEL_RIGHT_ID, true);
+
+            FEEDER_CONFIG
+                .idleMode(IdleMode.kBrake)
+                .inverted(false) //change?
+                .smartCurrentLimit(50);
+            HOPPER_CONFIG
+                .idleMode(IdleMode.kCoast)
+                .inverted(false) //change?
+                .smartCurrentLimit(50);
         }
 
     }
@@ -208,16 +201,19 @@ public final class Configs {
         static {
             INTAKE_CONFIG
                 .idleMode(IdleMode.kCoast)
-                .smartCurrentLimit(50);
-            INTAKE_CONFIG
-                .idleMode(IdleMode.kCoast)
+                .inverted(true)
                 .smartCurrentLimit(50);
             ROTATE_CONFIG
                 .idleMode(IdleMode.kBrake)
                 .smartCurrentLimit(50);
-            ROTATE_CONFIG
-                .idleMode(IdleMode.kBrake)
-                .smartCurrentLimit(50);
+            ROTATE_CONFIG.closedLoop
+                .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+                .p(.6)
+                .outputRange(-0.7, 0.7)
+                .maxMotion
+                .cruiseVelocity(1000)
+                .maxAcceleration(700)
+                .allowedProfileError(.25);
         }
     }
 }

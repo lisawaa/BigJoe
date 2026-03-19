@@ -2,15 +2,8 @@ package frc.robot.subsystems;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.revrobotics.PersistMode;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.ResetMode;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.Climb;
 import frc.robot.Constants.Configs;
 import frc.robot.Constants.IDs;
 import frc.robot.components.PIDMotor;
@@ -18,30 +11,32 @@ import frc.robot.components.PIDMotorIOSparkMax;
 
 public class ClimbSubsystem extends SubsystemBase{
     
-    private final PIDMotor innerLeft;
+    private final PIDMotor innerLeft; 
     private final PIDMotor innerRight;
-    
-    //private final SparkMax outerLeft;
-    //private final SparkMax outerRight;
+    private final DigitalInput limitSwitch;
 
-    //add limit switches?
     public ClimbSubsystem() {
-        innerLeft = new PIDMotor(new PIDMotorIOSparkMax(IDs.ClimbConstants.INNER_LEFT_ID, Configs.Climb.INNER_LEFT_CONFIG));
-        innerRight = new PIDMotor(new PIDMotorIOSparkMax(IDs.ClimbConstants.INNER_RIGHT_ID, Configs.Climb.INNER_RIGHT_CONFIG));
+        innerLeft = new PIDMotor(new PIDMotorIOSparkMax(IDs.ClimbConstants.CLIMB_LEFT_ID, Configs.Climb.LEFT_CONFIG));
+        innerRight = new PIDMotor(new PIDMotorIOSparkMax(IDs.ClimbConstants.CLIMB_RIGHT_ID, Configs.Climb.RIGHT_CONFIG));
+        limitSwitch = new DigitalInput(0);
         resetEncoders();
     }
-
-    public void moveInner(double speed) {
-        //if bot-limit switch
-        //speed = Math.max(speed, 0) <- prevents motors from impossibly going down
+    
+    public void move(double speed) {
         innerLeft.set(speed);
         innerRight.set(speed);
     }
 
-    public void moveOuter(double speed) {
-        //if bot-limit switch
-        //speed = Math.max(speed, 0) <- prevents motors from impossibly going down
-        //outerLeft.set(speed);
+    public void raise() {
+        while(innerLeft.getEncoder() > -317)
+            move(-0.8);
+        move(0);
+    }
+
+    public void retract() {
+        while(innerLeft.getEncoder() < 0)
+            move(0.8);
+        move(0);
     }
 
     public void resetEncoders() {
@@ -54,8 +49,17 @@ public class ClimbSubsystem extends SubsystemBase{
         innerRight.stopMotors();
     }
 
+    public double getEncoder() {
+        return innerLeft.getEncoder();
+    }
+
     @Override
     public void periodic () {
-
+        if(!limitSwitch.get()) {
+            resetEncoders();
+        }
+        Logger.recordOutput("Climb/Left", innerLeft.getEncoder());
+        Logger.recordOutput("Climb/Right", innerRight.getEncoder());
+        Logger.recordOutput("Climb/Switch", !limitSwitch.get());
     }
 }

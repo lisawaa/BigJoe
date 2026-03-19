@@ -23,4 +23,6 @@ public interface PIDMotorIO {
     default public void setVoltage(double voltage){}
 
     default public void stopMotors(){}
+
+    default public double getEncoder(){return 0;}
 }

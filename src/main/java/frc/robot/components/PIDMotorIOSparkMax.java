@@ -33,7 +33,7 @@ public class PIDMotorIOSparkMax implements PIDMotorIO {
     }
 
     @Override public void setSetpoint(double setpoint, double FF) {
-        controller.setSetpoint(setpoint, ControlType.kPosition, ClosedLoopSlot.kSlot0, FF);
+        controller.setSetpoint(setpoint, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0, FF);
     }
 
     @Override public void setVelocity(double RPM, double FF) {
@@ -50,5 +50,9 @@ public class PIDMotorIOSparkMax implements PIDMotorIO {
 
     @Override public void stopMotors(){
         motor.stopMotor();
+    }
+
+    @Override public double getEncoder(){
+        return encoder.getPosition();
     }
 }
